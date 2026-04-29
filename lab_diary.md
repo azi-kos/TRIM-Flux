@@ -24,6 +24,6 @@ Naredil fork originalnega TRIM repozitorija (uhlerlab/TRIM) na GitHub pod račun
 Napisal preprocessing notebook (`notebooks/01_preprocessing.ipynb`) ki iz surovih GEO podatkov naredi `.pkl` fajle za TRIM.
 
 ### Opažanja in rezultati
-_(dopolni po zagonu v Colabu)_
+Potrebno je bilo zbrati metadata oz. identifikacijske podatke celic v skupno tabelo (iz 4 različnih) in nato preko te filtrirati surove podatke. Veliko je bilo vnosov brez celic, ki sem jih izločil. Vse celice morajo imeti tako TCR podatke kot RNA podatke. Paziti je bilo tudi treba na mešanje "barcode" šifer, ker so se ponavljale zaradi vzporednih izvedb sekvenciranja.
 
 ---
