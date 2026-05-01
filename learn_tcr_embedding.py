@@ -4,7 +4,6 @@ Learn TCR embeddings using an autoencoder.
 import numpy as np
 import pandas as pd
 import scipy.io
-import sklearn.decomposition
 import sklearn.svm
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -329,7 +328,7 @@ def get_x_tcr_from_label(labels_matrix):
 ############### START data loading
 ###############
 
-data_path = 'your_data_directory'
+data_path = '/content/drive/MyDrive/Diploma/data/processed'
 pca_file_path = os.path.join(data_path, 'data_rna_pca.pkl')
 
 TRAINING_STEPS = 50100
@@ -342,12 +341,6 @@ print('output_path:', output_path)
 # Read in data ---------------------------------------------------------
 with open(os.path.join(data_path, 'data_rna.pkl'), 'rb') as f:
     data_rna = pickle.load(f)
-
-with open(os.path.join(data_path, 'data_rna_rows.pkl'), 'rb') as f:
-    data_rna_rows = pickle.load(f)
-
-with open(os.path.join(data_path, 'data_rna_cols.pkl'), 'rb') as f:
-    data_rna_cols = pickle.load(f)
 
 with open(os.path.join(data_path, 'data_labels.pkl'), 'rb') as f:
     data_labels = pickle.load(f)
@@ -380,20 +373,21 @@ col_tcr = data_labels.columns.get_loc('CDR3(Beta1)')
 npca = 100
 print('PCA to npca:', npca)
 if not os.path.exists(pca_file_path):
-    pca = sklearn.decomposition.PCA(npca, random_state=0)
-    combined_data_pca = pca.fit_transform(data_rna)
+    from sklearn.decomposition import TruncatedSVD
+    svd = TruncatedSVD(npca, random_state=0)
+    combined_data_pca = svd.fit_transform(data_rna)
     pickle.dump(combined_data_pca, open(pca_file_path, 'wb+'))
-    pickle.dump(pca, open(pca_file_path.replace('data_rna_pca.pkl', 'rna_pca.pkl'), 'wb+'))
-    print('RNA PCA saved to {}'.format(pca_file_path))
+    pickle.dump(svd, open(pca_file_path.replace('data_rna_pca.pkl', 'rna_pca.pkl'), 'wb+'))
+    print('RNA TruncatedSVD saved to {}'.format(pca_file_path))
 else:
     combined_data_pca = pickle.load(open(pca_file_path, 'rb'))
-    print('RNA PCA loaded from {}'.format(pca_file_path))
+    print('RNA TruncatedSVD loaded from {}'.format(pca_file_path))
 assert combined_data_pca.shape[1] == npca
 assert combined_data_pca.shape[0] == data_rna.shape[0]
 print('Finished PCA')
 
 #  use gpu if available
-device = torch.device("cuda:4" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 x_train = combined_data_pca # note: this is actually not going to be used in learning the tcr embeddings
 x_label = data_labels

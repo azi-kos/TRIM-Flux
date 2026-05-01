@@ -35,3 +35,15 @@ Napisal in dokončal preprocessing notebook (`notebooks/01_preprocessing.ipynb`)
 - `df_all_tcrs.pkl`: `48103` unikatnih CDR3β sekvenc, paddane na enako dolžino
 
 ---
+
+## 1.5.2026 — TCR embedding (CNN avtoencoder)
+
+### Kaj sem naredil
+Prepisal `learn_tcr_embedding.py` v notebook (`notebooks/02_tcr_embedding.ipynb`) in pognal na Colabu A100. Zamenjal `PCA` z `TruncatedSVD` (sparse matrika).
+
+### Rezultat
+- 50100 korakov, loss konvergiral: ~0.01 → ~0.0001
+- `data_tcr.pkl`: `(146776, 100)` — TCR embeddingi za vsako celico
+- UMAP ne kaže ločevanja po tkivu/fazi — pričakovano, ker CNN trenira samo na rekonstrukciji sekvence, ne na biološkem kontekstu. Ločevanje bo naloga TRIM VAE.
+
+---
