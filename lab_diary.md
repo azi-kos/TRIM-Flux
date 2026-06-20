@@ -84,7 +84,13 @@ Pregled `umap_rna_patient0.png` je pokazal prazna Tumor panela in ne-prekrivanje
 ### Opomba: P3 odpade
 Prvotno načrtovan P3 (shrani `tcr_dists` v `preds.npz`) je nesmiseln: `tcr_dists` je `pairwise_distances(preds_tcr)` čez vseh ~146k celic = 146776² × 8B ≈ **172 GB**. Original ga zato v `trim.py` **ne shrani** (zakomentiran v `np.savez`). `2.2.eval_gen.py:184` ga sicer bere, a je to nekonsistentna/mrtva koda v originalu. `our_expansion_prediction` (helpers.py) razdalje računa interno na majhnih generiranih podmnožicah. Notebook 03 torej že sledi originalu — `tcr_dists` se NE shranjuje.
 
+### Kaj sem naredil (P2)
+- `01_preprocessing.ipynb`: `df_all_tcrs` dobi 4 count stolpce (`'1'..'4'` = klonska velikost po kondiciji: blood-pre, blood-post, tumor-pre, tumor-post), kot original (`data_processing.py:115-135`). Counte izpeljem iz `data_labels` (CDR3(Beta1) × Tissue × Treatment Stage) in jih **poravnam na obstoječi vrstni red** `df_all_tcrs.index` (NE sortiram — sicer se TCR indeksi razsujejo). NaN za kondicije brez pojavitve (eval dela `.fillna(0)`).
+- Preverjeno na dejanskih podatkih: `(48110, 4)`, vsota countov = 146776 = št. celic. Eval-stil dostopi (`iloc[:,1]>iloc[:,0]`, `.sum(axis=1)`) delajo.
+- **Brez tega so njihove metrike ekspanzije (clont_count, expansion ROC) crashale.** Zdaj originalne `analysis/` metode tečejo skoraj nespremenjene.
+
 ### Naslednji korak
-- P5: kvantitativna metrika uspeha (kNN-overlap predicted vs real tumor-post) za heldout P24.
+- P5: pognati originalne evalvacijske metrike iz `analysis/HNSCC/` (clont_count_by_cluster Pearson r, diversity r) na novih `preds.npz` (heldout P24). Treba: prilagoditi vhode (`.pkl`, `ID_NULL_TCR=-1`, en heldout namesto 27, PCA cache).
+- **Pomembno:** `df_all_tcrs` zdaj ima stolpce — pred ponovnim zagonom notebooka 02/03 ni potrebnih sprememb (oba bereta le `.index`), a `df_all_tcrs.pkl` na Drive je treba **regenerirati z notebookom 01**.
 
 ---
