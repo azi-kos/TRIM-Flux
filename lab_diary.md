@@ -78,9 +78,13 @@ Pregled `umap_rna_patient0.png` je pokazal prazna Tumor panela in ne-prekrivanje
 - Shranjevanje **PCA objekta** (`rna_pca.pkl`), da evalvacija dela v istem prostoru (`inverse_transform`).
 - Opozorilo: pred ponovnim zagonom je treba **izbrisati star SVD cache** (`data_rna_pca.pkl`, `umap_trained_rna.pkl`) na Drive.
 
-### Naslednji koraki
-- P3: shrani `tcr_dists` v `preds.npz` (evalvacija ga bere).
-- P4: ponovni zagon z `heldout_patient = [24]`.
-- P5: kvantitativna metrika uspeha (kNN-overlap predicted vs real tumor-post).
+### Kaj sem naredil (P4)
+- `03_trim.ipynb`: `heldout_patient = [24]` namesto `[0]`. P24 ima vse 4 kvadrante (Blood-Pre 1548, Blood-Post 2109, Tumor-Pre 5568, Tumor-Post 8152) — smiseln za evalvacijo. Rezultati gredo v `holdout24`.
+
+### Opomba: P3 odpade
+Prvotno načrtovan P3 (shrani `tcr_dists` v `preds.npz`) je nesmiseln: `tcr_dists` je `pairwise_distances(preds_tcr)` čez vseh ~146k celic = 146776² × 8B ≈ **172 GB**. Original ga zato v `trim.py` **ne shrani** (zakomentiran v `np.savez`). `2.2.eval_gen.py:184` ga sicer bere, a je to nekonsistentna/mrtva koda v originalu. `our_expansion_prediction` (helpers.py) razdalje računa interno na majhnih generiranih podmnožicah. Notebook 03 torej že sledi originalu — `tcr_dists` se NE shranjuje.
+
+### Naslednji korak
+- P5: kvantitativna metrika uspeha (kNN-overlap predicted vs real tumor-post) za heldout P24.
 
 ---
