@@ -47,3 +47,20 @@ Prepisal `learn_tcr_embedding.py` v notebook (`notebooks/02_tcr_embedding.ipynb`
 - UMAP ne kaže ločevanja po tkivu/fazi — pričakovano, ker CNN trenira samo na rekonstrukciji sekvence, ne na biološkem kontekstu. Ločevanje bo naloga TRIM VAE.
 
 ---
+## 13.5.2026 — TRIM VAE trening (pacient 0)
+
+### Kaj sem naredil
+Prepisal `trim.py` v notebook (`notebooks/03_trim.ipynb`) s prilagoditvami za Colab A100 (argparse → spremenljivke, `cuda:1` → `cuda:0`, `PCA` → `TruncatedSVD`, `os.mkdir` → `os.makedirs`). Pognal trening za heldout pacienta 0 (leave-one-out).
+
+### Težave
+- **Pseudo-kloni (pairwise L1 razdalje na 146k × 146k)**: preveč RAM in časa. Rešeno z vzorcem 100k celic — threshold kalibriran na vzorcu, vrednost (`thresh_fitted=1.89`) shranjena v `args.txt`.
+- **UMAP transform** na vseh 146k napovedih precount — rešeno z `preds_rna[mask_leave_out]` (samo heldout celice).
+- `preds.npz` je bil prvič shranjen prazen (shranjevanje zakomentirano) — ponovljen zagon z naloženim `model.pth`.
+
+### Rezultat
+- 20000 korakov, loss konvergiral: `1.092 → 0.108`
+- `model.pth` shranjen pri korakih 10000 in 20000
+- `preds.npz`: `preds_rna` in `preds_tcr` za heldout pacienta 0
+- UMAP vizualizacija v teku
+
+---
