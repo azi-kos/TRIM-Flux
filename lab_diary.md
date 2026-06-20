@@ -64,3 +64,23 @@ Prepisal `trim.py` v notebook (`notebooks/03_trim.ipynb`) s prilagoditvami za Co
 - UMAP vizualizacija v teku
 
 ---
+
+## 20.6.2026 — Diagnoza prvih rezultatov in popravek reducerja (veja `replicate-original`)
+
+### Diagnoza
+Pregled `umap_rna_patient0.png` je pokazal prazna Tumor panela in ne-prekrivanje napovedi z realnimi celicami. Analiza je razkrila:
+- **Pacient 0 nima tumorskih celic** (Blood-Pre=571, Blood-Post=449, Tumor=0) — prazna panela nista bug, ampak napačna izbira heldouta. Le 4 pacienti (P18, P19, P24, P27) imajo vse 4 kvadrante; 22 ima Tumor-Post. Najboljši heldout: P24 (8152 Tumor-Post celic).
+- **Trening je zdrav** — loss lepo konvergira (0.285 → 0.108), RNA rekonstrukcija pa je najšibkejši člen (0.329 → 0.218), kar kaže na necentriran SVD prostor.
+- **Reducer neujemanje**: notebooka sta uporabljala `TruncatedSVD` (necentriran), original (`trim.py`, `analysis/`) pa `sklearn.PCA` (centriran). Napovedi so zato v drugem prostoru kot pri originalu; pri evalvaciji z `analysis/2.2.eval_gen.py` (ki naredi svoj PCA) bi to dalo nesmiselne rezultate.
+
+### Kaj sem naredil (P1)
+- `02_tcr_embedding.ipynb` in `03_trim.ipynb`: zamenjal `TruncatedSVD` → `sklearn.PCA(100)` na gosti `float32` matriki (sparse → dense, `del` + `gc` za RAM). Vrh ~40-50 GB, varno pri High-RAM.
+- Shranjevanje **PCA objekta** (`rna_pca.pkl`), da evalvacija dela v istem prostoru (`inverse_transform`).
+- Opozorilo: pred ponovnim zagonom je treba **izbrisati star SVD cache** (`data_rna_pca.pkl`, `umap_trained_rna.pkl`) na Drive.
+
+### Naslednji koraki
+- P3: shrani `tcr_dists` v `preds.npz` (evalvacija ga bere).
+- P4: ponovni zagon z `heldout_patient = [24]`.
+- P5: kvantitativna metrika uspeha (kNN-overlap predicted vs real tumor-post).
+
+---
