@@ -89,6 +89,11 @@ Prvotno načrtovan P3 (shrani `tcr_dists` v `preds.npz`) je nesmiseln: `tcr_dist
 - Preverjeno na dejanskih podatkih: `(48110, 4)`, vsota countov = 146776 = št. celic. Eval-stil dostopi (`iloc[:,1]>iloc[:,0]`, `.sum(axis=1)`) delajo.
 - **Brez tega so njihove metrike ekspanzije (clont_count, expansion ROC) crashale.** Zdaj originalne `analysis/` metode tečejo skoraj nespremenjene.
 
+### Kaj sem naredil (pseudo-kloni — crash fix)
+- `03_trim.ipynb` cell-25: `tcr_dists` se je računal na **vseh ~146k celicah** (`pairwise_distances(preds_tcr, preds_tcr)`) = 146776² × 8B ≈ **172 GB → crash** (isto kot 13.5.). Original to računa na 2 TB stroju; Colab High-RAM ima le ~83 GB system RAM (A100 80GB je VRAM, ne system RAM), zato večji Colab to ne reši.
+- **Popravek:** `tcr_dists` + `get_pseudoclones` zdaj delata **samo na heldout celicah** (P24 = 17377 celic → matrika 2.42 GB). Ker `get_pseudoclones` maskira `dists[i]` na isti `patient`+`bloodtumor`, je rezultat za heldout celice **identičen** polni matriki, brez odpadka. `pseudo_tcrs` se razširi nazaj na polno dolžino (-10 placeholder), da `preds.npz[mask_leave_out]` deluje.
+- Preverjeno: P24 ima 1548 blood-pre celic, 497 unikatnih klonov za kalibracijo `thresh` (dovolj), vse 4 kondicije prisotne.
+
 ### Naslednji korak
 - P5: pognati originalne evalvacijske metrike iz `analysis/HNSCC/` (clont_count_by_cluster Pearson r, diversity r) na novih `preds.npz` (heldout P24). Treba: prilagoditi vhode (`.pkl`, `ID_NULL_TCR=-1`, en heldout namesto 27, PCA cache).
 - **Pomembno:** `df_all_tcrs` zdaj ima stolpce — pred ponovnim zagonom notebooka 02/03 ni potrebnih sprememb (oba bereta le `.index`), a `df_all_tcrs.pkl` na Drive je treba **regenerirati z notebookom 01**.
