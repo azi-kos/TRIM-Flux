@@ -99,3 +99,27 @@ Prvotno načrtovan P3 (shrani `tcr_dists` v `preds.npz`) je nesmiseln: `tcr_dist
 - **Pomembno:** `df_all_tcrs` zdaj ima stolpce — pred ponovnim zagonom notebooka 02/03 ni potrebnih sprememb (oba bereta le `.index`), a `df_all_tcrs.pkl` na Drive je treba **regenerirati z notebookom 01**.
 
 ---
+
+## 20.6.2026 — Notebook 04: evalvacija klonske ekspanzije (Figure 4)
+
+### Kaj sem naredil
+Ustvaril `notebooks/04_expansion_eval.ipynb` — evalvacija napovedi klonske ekspanzije za **enega heldout pacienta naenkrat** (P24). Logika **prekopirana iz originala** (`analysis/HNSCC/helpers.py`), prilagojena na študentove vhode:
+- **`baseline_expansion_prediction_single`** (iz `helpers.py:284`): navaden klasifikator (kNN/NN × rna/tcr/both) na realnih blood celicah → ROC AUC. Ne rabi modela.
+- **`our_expansion_prediction_single`** (iz `helpers.py:395`): iz blood-pre `z` heldout pacienta generira celice v 4 kondicijah, šteje pseudo-klonalnost (`thresh_fitted/2`), primerja z resnično (`df_all_tcrs` counti).
+- **Končna ROC AUC** (iz `2.2.eval_gen.py:569-575`): `x = blood-post > blood-pre` (resnica), `y = pseudo BA/BB` (napoved).
+
+### Premoščena neujemanja (original → študent)
+`.npz`→`.pkl`, `data_labels` DataFrame→`.values`, `ID_NULL_TCR` 0→-1, trde poti→Drive, globalni scope, `Generator()` brez args (študentova verzija), **izpuščen mrtvi `tcr_dists`** (helpers.py:446).
+
+### Validacija (lokalno, s simuliranimi P2 counti)
+- JSON + sintaksa vseh celic: OK
+- Baseline P24: train 56795 celic, test 1503 (po OOD filtru), **60 ekspandiranih → ROC definiran**
+- Our P24: 1548 blood-pre, `real_clon` (1548,4), **69 ekspandiranih → ROC definiran**
+- Poravnava `recon_*_z` (03 `mask_leave_out`) ↔ `x_label_ho` (04): identična ✅
+
+### Pogoji za zagon (Colab)
+- `holdout24/preds.npz` z `recon_*_z` (cell-27 mora teči po pseudo-klonih)
+- `df_all_tcrs.pkl` na Drive = **P2-verzija** (regeneriraj z notebookom 01 — lokalna kopija je še stara, brez countov)
+- Per-patient: ROC na enem pacientu = šibka statistika; agregat čez 3-5 pacientov kasneje (razširi `output_folders`)
+
+---
