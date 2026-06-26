@@ -12,9 +12,5 @@ venv/
 .DS_Store
 *.ipynb_checkpoints/
 .ipynb_checkpoints/
-claude.md
-CLAUDE.md
-Diploma_sestanek_1.pptx
-abstrakt_konferenca.docx
-summary1.pptx
 memory/
+gitignore/
