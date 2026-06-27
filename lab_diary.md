@@ -123,3 +123,29 @@ Ustvaril `notebooks/04_expansion_eval.ipynb` — evalvacija napovedi klonske eks
 - Per-patient: ROC na enem pacientu = šibka statistika; agregat čez 3-5 pacientov kasneje (razširi `output_folders`)
 
 ---
+
+## 27.6.2026 — Flux razširitev: raziskava izvedljivosti + scFEA demo (veja `flux-extension`)
+
+### Merge
+Vse replikacijsko delo (P1, P2, P4, pseudo-fix, notebook 04) mergano v `main` (fast-forward). Vse veje (`replicate-original`, `flux-extension`, `rna-flux`) poravnane na `fe529ff`. Flux delo se nadaljuje na `flux-extension`.
+
+### Raziskava izvedljivosti flux pipeline
+Cilj Var 2 (RNA+TCR+Flux). Vhod: 146776 T-celic. Raziskal orodja (CLAUDE.md je predlagal iMAT/ftINIT — suboptimalno):
+- **Compass** (FBA): ~30 min/vzorec → per-cell na 147k = leta. NE sprejme zunanjega GEM. Izključen.
+- **ftINIT** (RAVEN/MATLAB): gradi context-specific MODEL, ne per-cell flux. Ni naš pipeline.
+- **scFEA** (GNN, GPU): IZBRAN. Per-cell, GPU-pospešen, ~168 modulov za človeka. Dropout-robusten (korelacija >0.85 pri simuliranem dropoutu, testirano v članku). Ne klasificira celičnega tipa → ne meša celic. Brez poolanja.
+
+### Razčiščene skrbi (vse iz virov)
+- Determinizem: znotraj zagona da; fiksiraj seed. Stabilnejši od Compass (LP ima več optimumov).
+- Mešanje celic: nemogoče — flux iz lastne ekspresije, ne klasifikacije.
+- ftINIT→Compass ideja odpadla: Compass ne sprejme zunanjega modela.
+
+### Kaj sem naredil
+Ustvaril `notebooks_flux/01_scfea_demo.ipynb` — proof-of-concept: namesti scFEA, vzame 2000 celic (P24), preveri orientacijo (geni×celice) + gene imena (simboli vs Ensembl), požene scFEA, **izmeri čas** → ekstrapolacija na cel dataset, pregleda flux izhod (celice × ~168 modulov).
+
+### Odprto / pred zagonom
+- Preveri **gene imena** v `data_rna` (scFEA rabi simbole, ne Ensembl ID); če Ensembl → pretvorba (mygene/pybiomart).
+- Preveri točna imena `module_gene` + `cmMat` v scFEA `data/` (auto-detekcija v cell-11).
+- Pridržek za diplomo: scFEA fluksi so RELATIVNI, model-odvisni; benchmark scFEA/Compass/METAFlux ne obstaja.
+
+---
