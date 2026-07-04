@@ -149,3 +149,25 @@ Ustvaril `notebooks_flux/01_scfea_demo.ipynb` — proof-of-concept: namesti scFE
 - Pridržek za diplomo: scFEA fluksi so RELATIVNI, model-odvisni; benchmark scFEA/Compass/METAFlux ne obstaja.
 
 ---
+
+## 28.6.2026 — scFEA debug saga + KRITIČNA najdba: prazne tumorske RNA celice
+
+### scFEA patchi (scFEA nevzdrževan od 2021, nezdružljiv z Colab 2026)
+Zaporedje ovir, vsaka odkrita po prejšnji: (1) magic-impute build pade → `--no-deps`; (2) `import magic` obvezen kljub `sc_imputation=False`; (3) napačen cmMat (iron) → `cmMat_c70_m168.csv`; (4) pandas 2.0 `.append` odstranjen → sed `._append`; (5) torch GPU `.numpy()` → `.cpu().numpy()`; (6) flux NaN — gene imena IZKLJUČENA (presek 658/663=99.2%), hipoteza normalizacija → `expm1` (log1p→surovi counti).
+
+### KRITIČNA najdba (prek data_rna_sample.pkl, 300 celic P24)
+Flux NaN je bil **simptom**, ne vzrok. Prava napaka:
+- **blood: 61/61 normalnih** (~4575 countov/celico)
+- **tumor: 231/239 praznih ali skoraj praznih** (mediana 2 counta — biološko nemogoče za T-celico)
+
+**Tumorske RNA celice so skoraj popolnoma prazne.** To ni flux problem, sega v notebook 01. `expm1` ni artefakt (0 vrstic v (0,1); surovi counti so cela števila).
+
+### Posledice (resne, cez cel projekt)
+- **TRIM je treniral na praznih tumorskih celicah** → verjeten razlog za slabe rezultate (ekspanzija AUC 0.52 ≈ naključje, UMAP pod-razpršen). Model se ni mogel naučiti tumorskega stanja.
+- Vsi dosedanji rezultati pod vprašajem. Flux ne more delati na praznih celicah (geneExprScale=0 → NaN).
+
+### Osumljenci (notebook 01) — diagnostika sledi
+1. branje tumorskih `.h5` (že prazne?); 2. `anndata.concat(join='inner')` (presek genov izloči tumorske?); 3. barcode lookup cell-11 (napačna povezava?).
+**Prioriteta PRED flux:** najdi vzrok → popravi preprocessing → regeneriraj data_rna → **re-treniraj TRIM**.
+
+---
