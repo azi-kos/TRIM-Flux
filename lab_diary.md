@@ -170,4 +170,15 @@ Flux NaN je bil **simptom**, ne vzrok. Prava napaka:
 1. branje tumorskih `.h5` (že prazne?); 2. `anndata.concat(join='inner')` (presek genov izloči tumorske?); 3. barcode lookup cell-11 (napačna povezava?).
 **Prioriteta PRED flux:** najdi vzrok → popravi preprocessing → regeneriraj data_rna → **re-treniraj TRIM**.
 
+### Diagnostika izvedena (00_diagnostika_tumor_rna.ipynb)
+- `join='inner'` OPROŠČEN: presek blood/tumor = 36601 (identični geni).
+- Vzrok: GEO ponuja SAMO `raw_feature_bc_matrix` (737280 barkod, večina empty droplets); notebook 01 nima QC. `raw_feature_bc_matrix.h5` v imenih potrjuje surovo matriko.
+- Korekcija prejšnje trditve: NI vse tumor prazno. Čez dataset ~30% praznih v OBEH tkivih (blood 34%, tumor 26%). P24 je bil nereprezentativno slab.
+- Original `data_processing.py` bere že-filtrirane `.mm` (ne na GEO) → QC korak manjka legitimno.
+
+### Popravek: QC filtriranje
+Raziskava (Luecken & Theis, 10x, EmptyDrops): `min_genes=200` standard. Distribucija genov/celico BIMODALNA (šum <50 vs celice >500) → prag varen. `min_genes` > `min_counts` za empty droplets.
+`01` cell-8: `sc.pp.filter_cells(min_genes=200)` v `load_h5_files`. Cell-22: QC preverba `assert n_empty==0`.
+**Posledica:** ~30% manj celic → nov data_labels/indeksi/df_all_tcrs → **ponoven 01→02→03 (re-trening)**. Flux bo potem deloval.
+
 ---
