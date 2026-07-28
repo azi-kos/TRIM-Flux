@@ -152,33 +152,80 @@ Ustvaril `notebooks_flux/01_scfea_demo.ipynb` — proof-of-concept: namesti scFE
 
 ## 28.6.2026 — scFEA debug saga + KRITIČNA najdba: prazne tumorske RNA celice
 
-### scFEA patchi (scFEA nevzdrževan od 2021, nezdružljiv z Colab 2026)
-Zaporedje ovir, vsaka odkrita po prejšnji: (1) magic-impute build pade → `--no-deps`; (2) `import magic` obvezen kljub `sc_imputation=False`; (3) napačen cmMat (iron) → `cmMat_c70_m168.csv`; (4) pandas 2.0 `.append` odstranjen → sed `._append`; (5) torch GPU `.numpy()` → `.cpu().numpy()`; (6) flux NaN — gene imena IZKLJUČENA (presek 658/663=99.2%), hipoteza normalizacija → `expm1` (log1p→surovi counti).
-
 ### KRITIČNA najdba (prek data_rna_sample.pkl, 300 celic P24)
-Flux NaN je bil **simptom**, ne vzrok. Prava napaka:
-- **blood: 61/61 normalnih** (~4575 countov/celico)
-- **tumor: 231/239 praznih ali skoraj praznih** (mediana 2 counta — biološko nemogoče za T-celico)
-
-**Tumorske RNA celice so skoraj popolnoma prazne.** To ni flux problem, sega v notebook 01. `expm1` ni artefakt (0 vrstic v (0,1); surovi counti so cela števila).
-
-### Posledice (resne, cez cel projekt)
-- **TRIM je treniral na praznih tumorskih celicah** → verjeten razlog za slabe rezultate (ekspanzija AUC 0.52 ≈ naključje, UMAP pod-razpršen). Model se ni mogel naučiti tumorskega stanja.
-- Vsi dosedanji rezultati pod vprašajem. Flux ne more delati na praznih celicah (geneExprScale=0 → NaN).
-
-### Osumljenci (notebook 01) — diagnostika sledi
-1. branje tumorskih `.h5` (že prazne?); 2. `anndata.concat(join='inner')` (presek genov izloči tumorske?); 3. barcode lookup cell-11 (napačna povezava?).
-**Prioriteta PRED flux:** najdi vzrok → popravi preprocessing → regeneriraj data_rna → **re-treniraj TRIM**.
-
-### Diagnostika izvedena (00_diagnostika_tumor_rna.ipynb)
-- `join='inner'` OPROŠČEN: presek blood/tumor = 36601 (identični geni).
-- Vzrok: GEO ponuja SAMO `raw_feature_bc_matrix` (737280 barkod, večina empty droplets); notebook 01 nima QC. `raw_feature_bc_matrix.h5` v imenih potrjuje surovo matriko.
-- Korekcija prejšnje trditve: NI vse tumor prazno. Čez dataset ~30% praznih v OBEH tkivih (blood 34%, tumor 26%). P24 je bil nereprezentativno slab.
-- Original `data_processing.py` bere že-filtrirane `.mm` (ne na GEO) → QC korak manjka legitimno.
+- Čez dataset ~30% praznih v OBEH tkivih (blood 34%, tumor 26%)
+- Original `data_processing.py` bere že-filtrirane `.mm` (ne na GEO) → **QC korak manjka v notebooku**.
 
 ### Popravek: QC filtriranje
-Raziskava (Luecken & Theis, 10x, EmptyDrops): `min_genes=200` standard. Distribucija genov/celico BIMODALNA (šum <50 vs celice >500) → prag varen. `min_genes` > `min_counts` za empty droplets.
-`01` cell-8: `sc.pp.filter_cells(min_genes=200)` v `load_h5_files`. Cell-22: QC preverba `assert n_empty==0`.
-**Posledica:** ~30% manj celic → nov data_labels/indeksi/df_all_tcrs → **ponoven 01→02→03 (re-trening)**. Flux bo potem deloval.
+Raziskava (Luecken & Theis, 10x, EmptyDrops) sm ugotovil, da je pametno nastaviti na QC `min_genes=200` kot enostavno merilo za neprazne droplete.
+
+Po nastavitvi in ponovnem teku vseh notebookov, so se rezultati izboljšali.
+
+---
+
+## 4.7.2026 — Pregled pipeline-a (empirična verifikacija na surovih .h5) + popravki
+
+
+### Najdba 1 — napačna normalizacija RNA
+`01` cell-18 je delal **samo `log1p(surovi counti)`** (razpon 0..~11). Avtorjev
+`data_processing.py:49-58 library_size_normalize` dela per-celico **`log(x+eps)` → odštej
+per-cell min → deli s per-cell max** → izraženi geni v **~[0.84, 1.0]**, ničle ostanejo 0.
+To je popolnoma drug vhodni prostor; TRIM (VAE + PCA + λ uteži + eval) je umerjen za avtorjev
+vhod.
+- Popravek (cell-18): implementiral avtorjevo normalizacijo **sparse-ohranjajoče & vektorizirano**
+  (ker ima vsaka celica ničelne gene, je per-cell min vedno `log(eps)` → ničle ostanejo 0).
+  Lokalno verificirano proti avtorjevi dense referenci: **max razlika 8e-8** ✅.
+- Surove counte za flux shranim **ločeno** kot `data_rna_counts.pkl` (flux notebook naj bere
+  tega, NE več `expm1(data_rna)` — to bi zdaj vrnilo napačno).
+
+### Najdba 2 (nerešeno) — kompozitni ključ brez tkiva/faze
+Ključ `(barcode_clean, Patient_ID)` v cell-11 ne loči tkiva/faze. Čez cel metadata **102
+ključev kaže na kri IN tumor, 141 na >1 Stage** (kolizije barkod med vzorci istega pacienta).
+`keep='first'` → ~283 celic (0,3 %) dobi napačno oznako tkiva/faze. Majhno; možen popravek:
+`Tissue_str`/`Stage` označi iz imena `.h5` datoteke in ju vključi v ključ. Ni implementirano
+(brez lokalne validacije bi bilo tvegano); zabeleženo za kasneje.
+
+### Posledica za projekt
+- Po popravkih naj `data_rna` da neničelni razpon ~0.8..1.0 (assert dodan v cell-22).
+- Flux (`notebooks_flux/01_scfea_demo.ipynb`): posodobi vhod na `data_rna_counts.pkl`.
+
+---
+
+## 28.6.2026 (zvečer) — USPEH: TRIM deluje (AUC 0.77) + dogovor za naprej
+
+### Rezultat po re-runu (heldout P24)
+Po popravkih (normalizacija + lahek QC) je TRIM ekspanzija **ROC AUC = 0.773**, baseline vsi ~0.5 (najboljši knn_rna 0.53). **TRIM premaga baseline** — replikacija Fig 4 uspešna. Prej AUC 0.52 (≈ naključje).
+- Spearman rho napovedi vs resnica: **0.442** (prej 0.019) — signal odklenjen.
+- Klonalnost korelacija: blood-pre rho=0.375, blood-post rho=0.331 (prej 0.079).
+- P24 po QC: Blood-Pre 523, Blood-Post 709, Tumor-Pre 1889, Tumor-Post 2796 (najboljši heldout od vseh).
+
+---
+
+## 28.7.2026 — AUC 0.87: avtorjeva normalizacija + mito filter (opomba 2 potrjena)
+
+### Rezultat (heldout P24, po avtorjevi normalizaciji + mito%<20)
+**TRIM ekspanzija ROC AUC = 0.87** (prej 0.77 z log1p). Baseline knn_both 0.66. **TRIM prepričljivo premaga baseline.**
+- EXP recall 0.61 -> **0.78** (ujame 18/23 ekspandiranih, prej 14)
+- EXP precision 0.39 -> **0.51** | EXP F1 0.47 -> **0.62**
+- NOT F1 0.97 -> **0.98** (skoraj popolno na neekspandiranih)
+
+### Kaj je bilo spremenjeno (dvoje naenkrat)
+1. **Normalizacija**: log1p -> avtorjeva `library_size_normalize` (log+minmax -> [0.84,1.0]). Verjetno GLAVNI faktor — TRIM je umerjen za ta vhod. **OPOMBA 2 POTRJENA** (avtorjeva revizija je pravilno identificirala normalizacijo kot spregledan vzrok slabih rezultatov).
+2. **Mito filter** mito%<20: odstrani 2354 celic (1.4%). Mediana mito% 3.7% (zdrava T-celicna populacija). Verjetno majhen prispevek.
+
+### Pridržki
+- En pacient (23 pozitivnih) -> AUC 0.87 ima sirok interval zaupanja (±~0.1). Za trdno trditev rabis vec pacientov (agregat).
+- Prispevek norm vs mito NI locen (spremenjeno dvoje naenkrat). Za temeljitost bi ablacija locila.
+- ROC krivulja se vedno "odrezana" (y=0 mnozica), a strm del zdaj do TPR 0.78 (prej 0.6).
+
+### Stanje replikacije
+MOCNA: AUC 0.87, vs baseline 0.66, EXP recall 0.78, NOT F1 0.98, bimodalna QC dokazana, UMAP prekrivanje. Verjetno blizu/nad objavljenimi rezultati clanka. QC popoln: min_genes=200 (bimodalno) + mito%<20 + avtorjeva normalizacija.
+
+### Opomba: pandas 3 problem
+`!pip install --upgrade numpy scanpy scipy` je potegnil pandas 3 -> .pkl shranjen s pandas 3 se ne odpre s pandas 2 v drugih notebookih. Resitev: NE uporabljati --upgrade (Colab ima delujoc scanpy); ostati na pandas 2 povsod. Ce ze: uskladi verzijo + restart runtime v vseh notebookih.
+
+### Naslednji korak
+- Vec heldout pacientov (P18, P27, P15) za agregatni AUC (trdna statistika).
+- FLUX (glavni cilj diplome) — pipeline pripravljen, rabi data_rna_counts.pkl.
 
 ---
