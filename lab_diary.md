@@ -241,3 +241,22 @@ Analiza kaže domnevno neničelne vrednosti, kot tudi biološo smiselnost rezult
 Izgradnja Flux encoderja in decoderja
 
 ---
+
+## 30.7.2026 - TRIM-Flux Var 1 (Flux + TCR, brez RNA)
+
+### Opis
+Flux vstavljen v TRIM kot zamenjava za RNA modaliteto TCR del.Vprašanje: ali metabolni flux sam nosi dovolj informacije za napoved klonalne ekspanzije? Notebooka `03_trim_flux` (trening) in `04_expansion_eval_flux` (evalvacija).
+
+### Problem in rešitev: flux se ni učil
+Prvi trening je pokazal flux recon loss = 0.000 -> model flux ignorira. Vzrok: scFEA flux je v majhni skali (mean ~0.006), zato MSE loss ~0.0001 izgubljen v TCR loss, ki je veliko večji (~0.15-0.3). RNA tega ni imel, ker gre skozi normalizacijo + PCA na visoko-variabilnih genih (komponente reda enot). Rešitev: **z-standardizacija fluxa po modulih** (vsak modul mean=0, std=1) -> mean(x^2) z 0.0003 na 0.99 -> flux loss primerljiv s TCR, model se enakovredno uči. Reverzibilno (shranjen mean/std v `flux_standardize.pkl`), brez izgube, ohrani interpretabilnost modulov.
+
+### Rezultati (P24)
+- **Flux + TCR: AUC = 0.70**
+- RNA + TCR (original): AUC = 0.87
+- Baseline (NN_both): AUC = 0.61
+- Confusion (Youden prag): EXP recall = 0.70, EXP precision = 0.11 (nizka precision = 4.4 % bazna stopnja ekspandiranih, ista neuravnoteženost kot pri RNA).
+
+### Interpretacija
+Flux je jasno nad baseline -> nosi realno informacijo o ekspanziji. A pod RNA+TCR -> ne nadomesti RNA. Biološko smiselno: flux (168 modulov) je kompresija RNA prek scFEA in ohrani velik del, a ne celotnega ekspanzijskega signala.
+
+---
