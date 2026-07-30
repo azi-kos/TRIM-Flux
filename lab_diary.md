@@ -224,8 +224,20 @@ MOCNA: AUC 0.87, vs baseline 0.66, EXP recall 0.78, NOT F1 0.98, bimodalna QC do
 ### Opomba: pandas 3 problem
 `!pip install --upgrade numpy scanpy scipy` je potegnil pandas 3 -> .pkl shranjen s pandas 3 se ne odpre s pandas 2 v drugih notebookih. Resitev: NE uporabljati --upgrade (Colab ima delujoc scanpy); ostati na pandas 2 povsod. Ce ze: uskladi verzijo + restart runtime v vseh notebookih.
 
-### Naslednji korak
-- Vec heldout pacientov (P18, P27, P15) za agregatni AUC (trdna statistika).
-- FLUX (glavni cilj diplome) — pipeline pripravljen, rabi data_rna_counts.pkl.
+---
+
+## 30.7.2026 - Fluxi so prvič uspešno izračunani
+
+### Opis
+scFEA je nevronska mreža, ki na podlagi biološke relevantnosti pretvori RNA podatke (gene in njihove counte) v flux matriko. Ker je program neposodobljen, ga je bilo treba posodobiti na pandas 3.0. verzijo (specifično ._append -> .concat) in vektorizirati vmesne podatke za veliko hitrejše predpripravljanje podatkov pred treningom.
+
+### Potek
+Na A100 80Gb je treniranje ~70.000 celic potekalo pre vektorizacijo v 18 urah, po vektorizaciji pa v 1 uri.
+
+### Rezultati
+Analiza kaže domnevno neničelne vrednosti, kot tudi biološo smiselnost rezultatov.
+
+### Naprej
+Izgradnja Flux encoderja in decoderja
 
 ---
