@@ -119,6 +119,9 @@ def log_run(log_dir, variant, heldout_patient, roc_auc, x, y,
             'thresh_fitted': float(thresh_fitted) if thresh_fitted is not None else None,
             'config': _to_jsonable(config) if config else None,
             'extra': _to_jsonable(extra) if extra else None,
+            # surova x (resnica 0/1) + y (napoved) za POOLED ROC cez vec zagonov/pacientov
+            'x_true': [int(v) for v in x.tolist()],
+            'y_score': [float(v) for v in y.tolist()],
         }
 
         seed_str = f'_seed{seed}' if seed is not None else ''
@@ -172,3 +175,62 @@ def summarize_by_variant(log_dir):
     g['std'] = g['std'].round(4)
     print(g.to_string(index=False))
     return g
+
+
+def pooled_roc(log_dir, variant=None, seed=None):
+    """
+    POOLED ROC: zdruzi surove x/y cez VSE zagone (paciente/seede) v en ROC -> ozji CI.
+    Kot original (vse heldout celice v en pool). Vrne dict {variant: (auc, n_cells, n_pos)}.
+    Filtriraj z variant/seed za ozji nabor. Zahteva log-e z 'x_true'/'y_score'
+    (novi log_run jih shrani; stari log-i brez tega se preskocijo z opozorilom).
+    """
+    import numpy as np
+    from collections import defaultdict
+    pools = defaultdict(lambda: {'x': [], 'y': [], 'n_runs': 0})
+    skipped = 0
+    for fn in sorted(os.listdir(log_dir)):
+        if not fn.endswith('.json'):
+            continue
+        try:
+            r = json.load(open(os.path.join(log_dir, fn), encoding='utf-8'))
+        except Exception:
+            continue
+        if variant is not None and r.get('variant') != variant:
+            continue
+        if seed is not None and r.get('seed') != seed:
+            continue
+        xt, ys = r.get('x_true'), r.get('y_score')
+        if xt is None or ys is None:
+            skipped += 1
+            continue
+        v = r.get('variant')
+        pools[v]['x'].extend(xt)
+        pools[v]['y'].extend(ys)
+        pools[v]['n_runs'] += 1
+    if skipped:
+        print(f'[pooled_roc] {skipped} starih logov brez x_true/y_score preskocenih.')
+
+    out = {}
+    try:
+        import sklearn.metrics
+        have_skl = True
+    except Exception:
+        have_skl = False
+    for v, d in pools.items():
+        x = np.asarray(d['x']); y = np.asarray(d['y'])
+        n_pos = int((x == 1).sum())
+        if not (0 < n_pos < len(x)):
+            print(f'[pooled_roc] {v}: en sam razred ({n_pos}/{len(x)}) -> ROC ni definiran.')
+            out[v] = (None, len(x), n_pos)
+            continue
+        if have_skl:
+            fpr, tpr, _ = sklearn.metrics.roc_curve(x, y, pos_label=1)
+            auc = float(sklearn.metrics.auc(fpr, tpr))
+        else:  # cist numpy AUC (rank)
+            order = np.argsort(-y); xs = x[order]
+            P, N = n_pos, len(x) - n_pos
+            tpr = np.cumsum(xs == 1) / P; fpr = np.cumsum(xs == 0) / N
+            auc = float(np.trapz(np.r_[0, tpr], np.r_[0, fpr]))
+        out[v] = (round(auc, 4), len(x), n_pos)
+        print(f'[pooled_roc] {v}: AUC={auc:.4f}  (pooled {d["n_runs"]} zagonov, {len(x)} celic, {n_pos} ekspandiranih)')
+    return out
