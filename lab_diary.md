@@ -260,3 +260,28 @@ Prvi trening je pokazal flux recon loss = 0.000 -> model flux ignorira. Vzrok: s
 Flux je jasno nad baseline -> nosi realno informacijo o ekspanziji. A pod RNA+TCR -> ne nadomesti RNA. Biološko smiselno: flux (168 modulov) je kompresija RNA prek scFEA in ohrani velik del, a ne celotnega ekspanzijskega signala.
 
 ---
+
+## 11.8.2026 - Var 2 (RNA+Flux+TCR) rezultat + audit + Monte Carlo setup
+
+### Rezultat Var 2 (en zagon, P24)
+**RNA+Flux+TCR: AUC = 0.954, EXP recall = 1.0 (23/23), precision = 0.40.** Presega RNA+TCR (0.87) in Flux+TCR (0.70). Sumljivo dobro -> temeljit audit.
+
+### Audit (5 agentov + primerjava z originalom)
+NI leakage, koda cista (24 najdb, 0 kriticnih). Kljucno:
+- Resnica x (df_all_tcrs count stolpci) NIKOLI ne vstopi v trening loss. Ekspanzija je cisto post-hoc eval metrika.
+- x (resnica) in y (napoved) pravilno poravnana, y ne vidi x niti posredno.
+- **RNA/flux VSTOPATA v napoved posredno**: mu = mean(recon_rna_z, recon_flux_z, recon_tcr_z) -> z -> decoder_tcr -> out_tcr -> pseudo-kloni. Koncni izhod je TCR, a z nosi RNA+flux info. Zato flux legitimno lahko dvigne AUC.
+- recall=1.0 je re-izraz AUC (velika y=0 masa zaradi filtra BB>=2), ne dodatna trditev. Hanley-McNeil: 95% CI [0.894, 1.0]. Skok 0.87->0.954 NI signifikanten (p~0.14).
+
+**Zakljucek: 0.954 ni napaka, a je nezanesljiv (n=23, en zagon, nedeterministicen trening).**
+
+### Popravki za dokazljivost (Monte Carlo)
+- **Seed**: trening je bil popolnoma nedeterministicen (ni manual_seed) -> dodan seed v vse 3 trening + 3 eval + flux (flux_seed). Zdaj reproducibilno.
+- **Hierarhija**: `runs/P{pid}/seed{s}/{variant}/` + centralni deljeni flux(per-seed)/RNA/TCR. Shrani model + checkpointe + losses + meta.
+- **>=5 pacientov**: diagnostika notebook (kvadranti + ekspandirani kloni) -> izbor. Pooled ROC funkcija za agregacijo.
+- **Nacrt**: 3 variante x >=5 pacientov x 3 seedi -> mean+-std + pooled. Test: je Var 2 prednost konsistentna cez paciente ali le P24 (selection bias)?
+
+### Pridrzek: thresh kalibracija (razlika od originala)
+Nasa koda kalibrira thresh_fitted le na heldout blood-pre celicah (train_mask_ho), original trim.py na globalnem mask_train (vsi pacienti). Nasa je del crash-fixa (polna tcr_dists 146k^2 = 172 GB). Blaga kalibracija na test-time distribuciji; NE leaka blood-post (audit potrjen), a lahko rahlo vpliva na AUC. Dokumentirano v cell-25 vseh 03 notebookov.
+
+---
