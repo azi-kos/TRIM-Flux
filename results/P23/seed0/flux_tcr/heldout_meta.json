@@ -1,0 +1,10 @@
+{
+  "pid": [
+    23
+  ],
+  "seed": 0,
+  "variant": "flux_tcr",
+  "n_train_cells": 66829,
+  "n_heldout_cells": 3101,
+  "flux_seed": 0
+}

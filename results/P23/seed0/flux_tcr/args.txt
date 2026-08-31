@@ -1,0 +1,18 @@
+{
+  "data_parent_folder": "/content/drive/MyDrive/Diploma/data/processed",
+  "heldout_patient": [
+    23
+  ],
+  "seed": 0,
+  "variant": "flux_tcr",
+  "flux_seed": 0,
+  "training_steps": 20000,
+  "batch_size": 4096,
+  "dimz": 1024,
+  "dim_state_embedding": 128,
+  "lambda_kl": 15,
+  "lambda_recon_flux": 1,
+  "lambda_recon_tcr": 1,
+  "lambda_embedding_norm": 10,
+  "delta_contrastive": 10
+}

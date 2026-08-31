@@ -1,0 +1,9 @@
+{
+  "pid": [
+    23
+  ],
+  "seed": 1,
+  "variant": "rna_tcr",
+  "n_train_cells": 66829,
+  "n_heldout_cells": 3101
+}
