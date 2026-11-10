@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Prenese uradne dokumente (UL FKKT + UL) za diplomsko delo v mapo ./originali/
-# Zaženi lokalno:  bash docs/diploma-pravila/prenesi_dokumente.sh
+# Zaženi lokalno:  bash diploma/pravila/prenesi_dokumente.sh
 set -u
 cd "$(dirname "$0")"
 mkdir -p originali

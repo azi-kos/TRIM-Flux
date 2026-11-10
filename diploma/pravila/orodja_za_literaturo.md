@@ -33,16 +33,9 @@ Za diplomo ne uporabljamo »deep research« ali več vzporednih agentov: so drag
 
 ## Kje in kako pišemo
 
-Predlog: diplomo pišemo **v repozitoriju kot Markdown** (`thesis/`, ena datoteka na poglavje), citati kot `[@citekey]`, in jo s Pandoc pretvorimo v Word:
+Diplomo pišemo **v repozitoriju kot Markdown** (`diploma/poglavja/`, ena datoteka na poglavje), citati so oblike `[@citekey]`, in jo s Pandoc pretvorimo v Word (`bash diploma/zgradi.sh`). Postopek je opisan v [`diploma/README.md`](../README.md).
 
-```bash
-pandoc thesis/*.md --citeproc --bibliography literatura/literatura.bib \
-  --csl docs/diploma-pravila/fkkt-ul.csl \
-  --reference-doc docs/diploma-pravila/originali/10_FKKT_Vzorec_diploma_magisterij_2024.docx \
-  -o diploma.docx
-```
-
-Prednosti: lahko pišem in popravljam neposredno v repozitoriju, sprememba je vidna v gitu, številke in slike iz `results/` se vstavijo samodejno, končni izgled pa vzame Word vzorec FKKT. Zadnji korak (naslovnica, izjava, PDF/A) narediš v Wordu.
+Prednosti: lahko pišem in popravljam neposredno v repozitoriju, vsaka sprememba je vidna v gitu, končni izgled pa da predloga FKKT. Zadnji korak (naslovnica, izjava, PDF/A) narediš v Wordu.
 
 ## Kako dodaš priporočene connectorje
 

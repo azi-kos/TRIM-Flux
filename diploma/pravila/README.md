@@ -5,7 +5,7 @@ Zbrano 10. 11. 2026. Velja za diplomsko delo 1. stopnje na UL FKKT. Ko se kaj ne
 **Originalne datoteke:** v tem okolju strežnik fkkt.uni-lj.si ni dosegljiv, zato originalov ni v repozitoriju. Prenese jih skripta:
 
 ```bash
-bash docs/diploma-pravila/prenesi_dokumente.sh   # -> docs/diploma-pravila/originali/
+bash diploma/pravila/prenesi_dokumente.sh   # -> diploma/pravila/originali/
 ```
 
 Datoteke v mapi:
