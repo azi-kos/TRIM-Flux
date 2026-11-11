@@ -48,15 +48,19 @@ Seznam uporabljenih kratic in simbolov
 
 | Kratica | Pomen |
 |---|---|
-| AUC | površina pod krivuljo ROC (angl. *area under the curve*) |
+| AUC | ploščina pod krivuljo ROC (angl. *area under the curve*) |
 | CDR3 | tretja regija, ki določa komplementarnost (angl. *complementarity-determining region 3*) |
-| FBA | analiza ravnovesja fluksov (angl. *flux balance analysis*) |
-| GEM | genomsko merilo metabolni model (angl. *genome-scale metabolic model*) |
-| GPR | povezava gen–protein–reakcija (angl. *gene–protein–reaction*) |
+| CTLA-4 | antigen 4, povezan s citotoksičnimi limfociti T (angl. *cytotoxic T-lymphocyte-associated protein 4*) |
+| FBA | analiza ravnotežja fluksov (angl. *flux balance analysis*) |
+| GEM | genomski metabolni model (angl. *genome-scale metabolic model*) |
+| GPR | gen–protein–reakcija (angl. *gene–protein–reaction*) |
 | HNSCC | ploščatocelični karcinom glave in vratu (angl. *head and neck squamous cell carcinoma*) |
 | PCA | analiza glavnih komponent (angl. *principal component analysis*) |
+| PD-1 | receptor programirane celične smrti 1 (angl. *programmed cell death protein 1*) |
 | ROC | krivulja delovanja sprejemnika (angl. *receiver operating characteristic*) |
 | scRNA-seq | sekvenciranje RNA posameznih celic (angl. *single-cell RNA sequencing*) |
+| scTCR-seq | sekvenciranje receptorjev celic T posameznih celic (angl. *single-cell T-cell receptor sequencing*) |
 | TCR | receptor celic T (angl. *T-cell receptor*) |
-| TRIM | model za združevanje TCR in RNA (angl. *TCR–RNA integrating model*) |
+| TRIM | model za združevanje TCR in RNA (angl. *TCR-RNA Integrating Model*) |
+| UMI | edinstveni molekulski identifikator (angl. *unique molecular identifier*) |
 | VAE | variacijski avtokodirnik (angl. *variational autoencoder*) |
