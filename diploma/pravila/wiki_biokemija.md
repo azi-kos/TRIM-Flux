@@ -99,4 +99,4 @@ Opomba: starejša stran wiki »Diplomsko delo« (2020) navaja povzetek 200–300
 |---|---|
 | F. Petrovič: *Modeliranje metabolizma duktalnega adenokarcinoma na ravni genoma*, diplomsko delo, UL FKKT, 2025, mentor M. Moškon. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=171844) | Isti mentor, FKKT, ftINIT in csGEM iz transkriptomskih podatkov: najboljši vzor za strukturo in obliko |
 | D. Vaupotič: *Modeliranje celične rasti*, diplomsko delo, UL FKKT, 2019. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=110310) | Računalniška diploma na FKKT (brez laboratorija) |
-| J. Nastran: *Integration and analysis of scRNAseq data using genome-scale metabolic models*, magistrsko delo, mentor M. Moškon. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=155937) | Vsebinsko zelo blizu (scRNA + GEM), za literaturo in metode; oblika ni FKKT |
+| J. Nastran: *Integration and analysis of scRNAseq data using genome-scale metabolic models*, magistrsko delo, mentor M. Moškon. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=155937) | Vsebinsko zelo blizu (scRNA + GEM), za literaturo in metode; fakulteta ni preverjena, oblika verjetno ni po FKKT |
