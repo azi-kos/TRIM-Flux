@@ -67,3 +67,36 @@ Rezultati in Razprava sta lahko združena, **če se tako dogovoriš z mentorjem*
 | Citiranje, oblika strani, UI | podrobno | ni omenjeno | velja README |
 
 **Za računalniško diplomo** (brez mokrega laboratorija) smiselno prenesemo pravila za Materiale in metode: podatki (vir, GEO številka, število celic/bolnikov), programska oprema in paketi z **verzijami**, strojna oprema (Colab A100), nastavitve in semena; rutinske korake (npr. normalizacija scRNA) samo s sklicem.
+
+## Kontrolni seznam (wiki FKKT, Biokemija)
+
+Vir: <https://wiki.fkkt.uni-lj.si/index.php?title=Diplome_-_kontrolni_seznam> (prebrano 11. 11. 2026). Na vsako točko mora biti odgovor »da« ali utemeljitev za komisijo.
+
+**Splošno**
+- Številke poglavij brez pike na koncu (»1 Uvod«, »2.1 Podatki«).
+- Tabela: naslov in kratek opis **nad** njo; slika: naslov in opis **pod** njo, na isti strani. Vsaka slika, tabela, enačba je omenjena v besedilu.
+- Decimalna vejica; presledek med številom in enoto (tudi `25 °C`, `5 %`); nad 9999 ločilo tisočic (`146 000`).
+- Številčni citati po vrstnem redu, znotraj stavka pred piko.
+- Brez trpnika in tujk; žargon zamenjaj s slovenskimi izrazi. Ne »s pomočjo«, ampak »z«.
+- Vsako novo poglavje se začne na desni (lihi) strani.
+- Do 30 oštevilčenih strani (+20 %), brez literature in prilog. Priložen seznam nebesedilnih sestavin.
+
+**Naslovnica:** po uradnem vzorcu 2024. **Povzetek in Abstract:** vsak največ 1 stran, angleški z  prevedenim naslovom, 3–5 ključnih besed.
+**Kratice:** abecedno, razlaga slovensko, brez enot in kemijskih formul, vse uporabljene kratice.
+**Uvod:** ≤1/3, vsaka trditev podprta z virom.
+**Namen in hipoteze:** namen kot opis problema (ne povzetek), vsaj ena hipoteza kot trditev.
+**Rezultati:** vsak prikazan rezultat opisan v besedilu s sklicem; »slika 3«, »tabela 2« z malo začetnico; **odstrani naslove in okvirje grafov, ki jih doda program** (naslov gre pod sliko).
+**Razprava:** primerjava z drugimi raziskavami, **vsaj 5 objavljenih del**.
+**Zaključek:** kratek in informativen, ne prepisan povzetek.
+**Literatura:** dosledno; vsi avtorji (pri >10 prvi trije + »in sod.«); naslovi z malimi začetnicami (razen prve).
+**Drugo:** kratica desno v zloženki (»celice HEK293«, »celice T CD8+«); zahvala (neobvezna) med izjavo in kazalom; seznami slik/tabel niso potrebni; v tabelah velika začetnica samo v glavi ali celih stavkih, števila poravnana na decimalno vejico; oznake slik slovensko, male začetnice.
+
+Opomba: starejša stran wiki »Diplomsko delo« (2020) navaja povzetek 200–300 besed in ~50 000 znakov; novejši kontrolni seznam in navodila v1.2 imajo prednost.
+
+## Primeri diplom
+
+| Delo | Zakaj je uporabno |
+|---|---|
+| F. Petrovič: *Modeliranje metabolizma duktalnega adenokarcinoma na ravni genoma*, diplomsko delo, UL FKKT, 2025, mentor M. Moškon. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=171844) | Isti mentor, FKKT, ftINIT in csGEM iz transkriptomskih podatkov: najboljši vzor za strukturo in obliko |
+| D. Vaupotič: *Modeliranje celične rasti*, diplomsko delo, UL FKKT, 2019. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=110310) | Računalniška diploma na FKKT (brez laboratorija) |
+| J. Nastran: *Integration and analysis of scRNAseq data using genome-scale metabolic models*, magistrsko delo, mentor M. Moškon. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=155937) | Vsebinsko zelo blizu (scRNA + GEM), za literaturo in metode; oblika ni FKKT |
