@@ -11,7 +11,7 @@ diploma/
 │   ├── kandidati.md       seznam virov, ki jih še potrebujemo
 │   └── opombe/            ena kratka kartica na vir (_predloga.md)
 ├── slike/                 lastne slike (PNG/SVG), vstavi: ![Slika 1: opis](slike/ime.png)
-├── predloga/              Word referenca z obliko FKKT (A4, 3 cm, TNR 12, 1,15, naslovi 16/14/12)
+├── predloga/              Word referenca po Vzorcu FKKT 2026 + razdelki.py (naslovnici, izjava, lihe strani)
 ├── pravila/               pravila FKKT/UL, citatni slog fkkt-ul.csl, orodja za literaturo
 └── zgradi.sh              Markdown -> izhod/diploma.docx
 ```
@@ -22,7 +22,9 @@ diploma/
 bash diploma/zgradi.sh                 # potrebuje pandoc (>= 3) in python-docx
 ```
 
-Kazalo se v Wordu osveži z desnim klikom → »Posodobi polje«. Naslovnico, notranjo naslovnico in Izjavo o avtorstvu na koncu prenesemo iz uradnega vzorca FKKT (`pravila/prenesi_dokumente.sh` ga prenese). Sledi izvoz v PDF/A.
+Izhod sledi **Vzorcu UL FKKT 2026**: naslovnica, notranja naslovnica in izjava o avtorstvu (z alinejo o UI) se naredijo iz `metadata.yaml`; vsak del in vsako poglavje se začne na lihi strani; prvi odsek je brez številk strani, od Uvoda naprej so številke spodaj na sredini. Word ob odprtju vpraša, ali naj posodobi polja: potrdi, da se izpolni kazalo. Na koncu izvoz v PDF/A in elektronski podpis izjave.
+
+V `metadata.yaml` nastavi `spol: m` ali `spol: ž`, da izjava uporabi pravilne oblike (podpisani/podpisana ...).
 
 ## Pisanje
 

@@ -4,6 +4,9 @@ title: "Napovedovanje klonske ekspanzije limfocitov T z združevanjem transkript
 title-en: "Predicting T-cell clonal expansion by integrating transcriptome, T-cell receptors and metabolic fluxes"
 author: "Aljaž Kos"
 mentor: "prof. dr. Miha Moškon"
+mentor-rodilnik: "prof. dr. Mihe Moškona"   # za izjavo o avtorstvu (»pod mentorstvom ...«)
+# somentor: ""                               # samo, če je imenovan
+spol: ""   # m ali ž: oblike v izjavi o avtorstvu (podpisani/podpisana ...); prazno = obe obliki kot v Vzorcu
 program: "Biokemija"
 kraj-leto: "Ljubljana, 2026"
 lang: sl-SI
