@@ -10,9 +10,9 @@ Kjer se razlikuje od splošnih pravil UL FKKT, **imajo ta navodila prednost**. S
 
 | Dokument | Povezava |
 |---|---|
-| Splošna navodila FKKT za dipl./mag. delo (PDF, 2024) | <https://fkkt.uni-lj.si/fileadmin/user_upload/Studentski_referat/Pravilniki_studij/Navodila_za_izdelavo_dipl_mag_dela_2024.pdf> |
-| Vzorec diploma/magisterij (DOCX, 2024), prilagodi svojemu programu | <https://fkkt.uni-lj.si/fileadmin/user_upload/Studentski_referat/Pravilniki_studij/Vzorec_diploma_magisterij_2024.docx> |
-| Obrazec: Seznam nebesedilnih sestavin (XLSX, 2022c) | <http://web.fkkt.uni-lj.si/biokemija/Seznam%20nebesedilnih%20sestavin%202022c.xlsx> |
+| Splošna navodila FKKT za dipl./mag. delo (PDF, 2024) | povezava na wikiju vrne 404; **velja nova verzija 2026**, glej [README.md](README.md) |
+| Vzorec diploma/magisterij (DOCX, 2024) | še deluje, a **velja Vzorec 2026**, glej [README.md](README.md) |
+| Obrazec: Seznam nebesedilnih sestavin (XLSX, 2022c) | <http://web.fkkt.uni-lj.si/biokemija/Seznam%20nebesedilnih%20sestavin%202022c.xlsx> (11. 11. 2026 strežnik ni bil dosegljiv; po potrebi vprašaj mentorja ali tajništvo katedre) |
 
 LaTeX predloge ni. O citatnem slogu, ključnih besedah, angleškem povzetku in UI stran ne pove ničesar (velja splošno, glej [README.md](README.md)).
 
@@ -100,3 +100,25 @@ Opomba: starejša stran wiki »Diplomsko delo« (2020) navaja povzetek 200–300
 | F. Petrovič: *Modeliranje metabolizma duktalnega adenokarcinoma na ravni genoma*, diplomsko delo, UL FKKT, 2025, mentor M. Moškon. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=171844) | Isti mentor, FKKT, ftINIT in csGEM iz transkriptomskih podatkov: najboljši vzor za strukturo in obliko |
 | D. Vaupotič: *Modeliranje celične rasti*, diplomsko delo, UL FKKT, 2019. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=110310) | Računalniška diploma na FKKT (brez laboratorija) |
 | J. Nastran: *Integration and analysis of scRNAseq data using genome-scale metabolic models*, magistrsko delo, mentor M. Moškon. [RUL](https://repozitorij.uni-lj.si/IzpisGradiva.php?id=155937) | Vsebinsko zelo blizu (scRNA + GEM), za literaturo in metode; fakulteta ni preverjena, oblika verjetno ni po FKKT |
+
+## Petrovič 2025: kaj pokaže dejanska diploma pri Moškonu
+
+F. Petrovič, *Modeliranje metabolizma duktalnega adenokarcinoma na ravni genoma*, UL FKKT, Biokemija, mentor prof. dr. M. Moškon, 2025 (67 strani PDF, prebrano 11. 11. 2026). Oddana je bila pred pravili 2026.
+
+| Del | Kako je narejeno | Za nas |
+|---|---|---|
+| Naslovnica, notranja naslovnica, izjava | po Vzorcu (izjava še brez alineje o UI) | uporabimo Vzorec 2026 |
+| Prazne strani | vsak del prvega odseka in vsako poglavje se začne na lihi strani | naša gradnja to naredi samodejno |
+| Glava | »F. Petrovič, *naslov*« na vsaki strani drugega odseka | neobvezno; dodamo, če želiš |
+| Povzetek / Abstract | vsak na svoji strani, naslov dela nad njim, 4 ključne besede | enako |
+| Kratice | slovenska razlaga + »(angl. ...)«; vključene tudi DNA, ATP | po kontrolnem seznamu Biokemije DNA, RNA ipd. izpustimo |
+| Uvod | str. 1–6 (pod 1/3) | ciljamo 8–9 strani |
+| Namen | »Namen dela«, pol strani, **brez hipotez** | pravila Biokemije zahtevajo hipoteze, zato jih obdržimo |
+| Materiali in metode | str. 9–17: podatki, model Human1, ftINIT, pragovi, statistični testi, vizualizacija | podoben vrstni red: podatki → predobdelava → modeli → evalvacija |
+| Rezultati in razprava | **združeno** v eno poglavje, str. 19–31 | po pravilih Biokemije ločeno (Moškon je pri Petroviču združeno sprejel) |
+| Zaključek | str. 33 | 1–2 strani |
+| Literatura | str. 35–40, 53 virov; imena revij večinoma izpisana v celoti (ne po CAS) | držimo se Navodil: kratice revij in DOI |
+| Priloge | dodatni grafi (P1, P2 ...) | po potrebi |
+| Slike | »Slika 7: ...« pod sliko, tabela z naslovom nad njo | enako |
+
+Petrovičeva diploma je dober vzor za **obseg in strukturo računalniške diplome pri Moškonu**, ni pa vir pravil: kjer se razlikuje od Navodil 2026 ali pravil Biokemije, sledimo pravilom.
