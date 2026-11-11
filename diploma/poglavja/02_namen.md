@@ -1,4 +1,8 @@
-<!-- 1–2 strani. Tu so hipoteze (navodila FKKT). -->
+<!-- 1–2 strani. Navodila Biokemija v1.2 + kontrolni seznam:
+     - naslov po številu hipotez: »Namen dela in hipoteza / hipotezi / hipoteze«;
+     - pisano v PRETEKLIKU (kaj smo želeli ugotoviti pred začetkom dela);
+     - namen kot opis problema, ne povzetek dela; lahko predvidene metode, NE rezultati;
+     - vsaj ena hipoteza kot trditev, katere resničnosti pred delom ni bilo mogoče vedeti. -->
 
 # Namen dela in hipoteze
 
