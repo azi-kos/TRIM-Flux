@@ -1,7 +1,8 @@
 <!--
 PRVI ODSEK (pred kazalom). Naslovnico, notranjo naslovnico in Izjavo o avtorstvu dodamo na koncu v Wordu
 iz uradnega vzorca FKKT (Vzorec_diploma_magisterij_2024.docx), ker zahtevajo natančno postavitev in digitalni podpis.
-Povzetek: brez slik in citatov, razumljiv samostojno, ~200–300 besed. 3–5 ključnih besed.
+Povzetek: ½ do 1 stran (področje, namen, metodološki pristop, ključni rezultati, kratek zaključek), brez slik in citatov,
+razumljiv samostojno, 3–5 ključnih besed. Abstract: največ 1 stran, s prevedenim naslovom, 3–5 keywords.
 Napišemo ga ZADNJEGA.
 -->
 
@@ -31,7 +32,8 @@ Napišemo ga ZADNJEGA.
 
 # Seznam kratic in simbolov {.unnumbered}
 
-<!-- abecedno; brez SI enot in simbolov elementov. Dopolnjujemo sproti. -->
+<!-- abecedno, razlaga slovensko (angleško le, če je sicer nejasno); vse kratice iz besedila.
+     NE: SI enote, kemijske formule, uveljavljene kratice (DNA, RNA, PCR ...), kratice, uporabljene samo enkrat. -->
 
 | Kratica | Pomen |
 |---|---|

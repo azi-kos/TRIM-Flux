@@ -28,6 +28,8 @@ Kazalo se v Wordu osveži z desnim klikom → »Posodobi polje«. Naslovnico, no
 
 - Citat: `... klonsko ekspanzijo [@kljuc2023].` V Wordu postane `[1]`, pred piko, oštevilčeno po vrstnem redu.
 - Komentarji `<!-- ... -->` so delovne opombe in se ne izpišejo.
-- Obseg: okoli 30 strani. Okvirno: Uvod 8–9, Namen 1–2, Metode 7–8, Rezultati in razprava 8–9, Zaključek 1–2.
+- Obseg: do 30 oštevilčenih strani brez literature in prilog (±20 %). Okvirno: Uvod 8–9 (največ 1/3), Namen 1–2, Materiali in metode 7–8, Rezultati 5, Razprava 4, Zaključek 1–2.
+- Vrstni red poglavij po navodilih za Biokemijo: Uvod, Namen dela in hipoteze, Materiali in metode, Rezultati, Razprava, Zaključek, Literatura.
+- Pred oddajo preveri [kontrolni seznam](pravila/wiki_biokemija.md#kontrolni-seznam-wiki-fkkt-biokemija). V Wordu nastavi, da se vsako poglavje začne na lihi strani (prelom razdelka »Liha stran«), in priloži seznam nebesedilnih sestavin (XLSX).
 - Številke v rezultatih vpisujemo iz shranjenih logov v `results/logs/`, ne na pamet.
 - Pravila oblike, citiranja in uporabe UI so povzeta v [`pravila/README.md`](pravila/README.md).

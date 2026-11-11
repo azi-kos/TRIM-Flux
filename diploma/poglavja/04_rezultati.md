@@ -1,7 +1,10 @@
-<!-- ~8–9 strani. Rezultati s tabelami in slikami (lastne, iz results/ in analize/), razprava primerja s hipotezami in literaturo.
-     Vse številke vpisujemo iz shranjenih JSON logov (results/logs/), ne na pamet. -->
+<!-- ~5 strani. Samo rezultati (razprava je v ločenem poglavju, navodila Biokemija v1.2).
+     Vse številke vpisujemo iz shranjenih JSON logov (results/logs/), ne na pamet.
+     Kontrolni seznam: vsak prikazan rezultat opisan v besedilu s sklicem (»slika 3«, »tabela 2«, mala začetnica);
+     slike lastne, vse oznake (osi, legende) v slovenščini, decimalna vejica; odstrani naslove in okvirje grafov,
+     ki jih doda program (naslov in opis gresta POD sliko, pri tabeli NAD tabelo). -->
 
-# Rezultati in razprava
+# Rezultati
 
 ## Kontrola kakovosti in opis podatkov
 
@@ -23,9 +26,3 @@
 
 <!-- - rna_flux_tcr vs rna_tcr; enkratni 0,954 je bil šum (pokaži razpršenost med semeni)
      - statistična primerjava, interval zaupanja; ablacija (var. 3), če bo izvedena -->
-
-## Razprava
-
-<!-- - zakaj fluksi ne prispevajo (veliko) nove informacije: izpeljani iz iste RNA, kompresija
-     - omejitve: malo bolnikov, nedeterminizem učenja, izbira metode za fluks, kalibracija praga
-     - primerjava z literaturo o metabolizmu T-celic -->
