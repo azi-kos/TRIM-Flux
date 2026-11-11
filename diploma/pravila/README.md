@@ -1,6 +1,6 @@
 # Pravila in predloge za diplomsko delo (UL FKKT)
 
-Zbrano 10. 11. 2026. Velja za diplomsko delo 1. stopnje na UL FKKT. Ko se kaj ne ujema, ima prednost dogovor z mentorjem (prof. Moškon) in najnovejša verzija na spletni strani FKKT.
+Zbrano 10. 11. 2026. Velja za diplomsko delo 1. stopnje na UL FKKT. **Za študij Biokemije** veljajo še strožja navodila z wiki FKKT, ki imajo prednost pred splošnimi: glej [`wiki_biokemija.md`](wiki_biokemija.md). Ko se kaj ne ujema, ima prednost dogovor z mentorjem (prof. Moškon) in najnovejša verzija na spletni strani FKKT.
 
 **Originalne datoteke:** v tem okolju strežnik fkkt.uni-lj.si ni dosegljiv, zato originalov ni v repozitoriju. Prenese jih skripta:
 
@@ -16,6 +16,7 @@ Datoteke v mapi:
 | `prenesi_dokumente.sh` | prenos vseh originalov (PDF, DOCX) |
 | `fkkt-ul.csl` | neuradni citatni slog za Zotero/Pandoc, ki točno sledi primeru iz navodil FKKT |
 | `orodja_za_literaturo.md` | priporočeni connectorji, orodja in poceni postopek dela z literaturo |
+| `wiki_biokemija.md` | navodila z wiki FKKT za študij Biokemije (v1.2, 3. 7. 2025) in primerjava s tem povzetkom |
 
 ## 1. Uradni dokumenti
 
