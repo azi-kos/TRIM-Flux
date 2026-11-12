@@ -1,0 +1,98 @@
+{
+  "zagonov_vseh": 18,
+  "zagonov_glavnih": 17,
+  "tau_na_meji": 6,
+  "meja_tau": 0.7694497527671316,
+  "tau_na_meji_zagoni": [
+    {
+      "razlicica": "flux_tcr",
+      "bolnik": 23,
+      "seme": 1
+    },
+    {
+      "razlicica": "flux_tcr",
+      "bolnik": 24,
+      "seme": 0
+    },
+    {
+      "razlicica": "flux_tcr",
+      "bolnik": 24,
+      "seme": 1
+    },
+    {
+      "razlicica": "flux_tcr",
+      "bolnik": 24,
+      "seme": 2
+    },
+    {
+      "razlicica": "rna_tcr",
+      "bolnik": 24,
+      "seme": 0
+    },
+    {
+      "razlicica": "rna_tcr",
+      "bolnik": 24,
+      "seme": 1
+    }
+  ],
+  "ponovljeni_zagon": {
+    "razlicica": "flux_tcr",
+    "bolnik": 23,
+    "oba_glavna": false,
+    "zagon_a": "seme 0 (20260822-123807)",
+    "zagon_b": "seme 0 (20260822-140156)",
+    "isto_seme": true,
+    "auc_a": 0.7447076508397263,
+    "auc_b": 0.7295355587808419,
+    "razlika": 0.015172092058884479,
+    "z": 2.8867976739851313,
+    "p": 0.003891844070058363,
+    "spearman_ocen": 0.9707453515903355
+  },
+  "pari_semen_p_pod_0_05": 11,
+  "pari_semen_vseh": 18,
+  "glavni_pari_semen_p_pod_0_05": 9,
+  "glavni_pari_semen_vseh": 16,
+  "spearman_med_semeni": {
+    "rna_tcr": [
+      0.4988623987262553,
+      0.7721599180639958
+    ],
+    "flux_tcr": [
+      -0.02850369550698151,
+      0.2974571542976454
+    ],
+    "rna_flux_tcr": [
+      0.36185133867726715,
+      0.7591944875351159
+    ]
+  },
+  "delez_y0": {
+    "flux_tcr_23": [
+      0.0,
+      0.5289042277825712
+    ],
+    "flux_tcr_24": [
+      0.45315487571701724,
+      0.864244741873805
+    ],
+    "rna_flux_tcr_23": [
+      0.4831751509922347,
+      0.5142364106988784
+    ],
+    "rna_flux_tcr_24": [
+      0.9254302103250478,
+      0.9349904397705545
+    ],
+    "rna_tcr_23": [
+      0.4840379637618637,
+      0.5409836065573771
+    ],
+    "rna_tcr_24": [
+      0.9005736137667304,
+      0.9636711281070746
+    ]
+  },
+  "razlicice_p_pod_0_05": 10,
+  "razlicice_vseh": 16
+}
