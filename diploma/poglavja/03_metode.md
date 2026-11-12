@@ -96,7 +96,7 @@ Izvorna koda scFEA od leta 2021 ni posodobljena, zato smo jo za novejše različ
 
 <!-- ZVEZEK: fluksi_kosi_sestava.csv (kateri bolniki in kvadranti so v katerem kosu), fluksi_kosi_eta2.csv. -->
 
-Celoten izračun smo izvedli trikrat in zagone označili s semeni 0, 1 in 2. Vsak zagon smo uporabili pri učenju modela TRIM z istim semenom. Ker scFEA nastavi lastno fiksno seme, smo pričakovali, da se bodo zagoni razlikovali le zaradi nedeterminističnih operacij na grafičnem procesorju. Ujemanje med zagoni smo preverili s Pearsonovim korelacijskim koeficientom (razdelek 4.3).
+Celoten izračun smo izvedli trikrat in zagone označili s semeni 0, 1 in 2. Vsak zagon smo uporabili pri učenju modela TRIM z istim semenom. Ker scFEA nastavi lastno fiksno seme, smo pričakovali, da se bodo zagoni razlikovali le zaradi nedeterminističnih operacij na grafičnem procesorju. Ujemanje med zagoni smo preverili s Pearsonovim korelacijskim koeficientom (razdelek 4.4).
 
 Rezultat scFEA je za vsako celico vektor 168 fluksov. scFEA flukse oceni samo iz izražanja genov, brez meritev hitrosti reakcij, zato so relativni in odvisni od modela; ne razlagamo jih kot absolutne hitrosti reakcij. Njihove vrednosti so bile majhne (povprečje okoli 0,006), zato je bila napaka rekonstrukcije fluksov v funkciji izgube zanemarljiva v primerjavi s členi za TCR in model flukse prezrl. Vsak modul $m$ smo zato standardizirali na vseh celicah:
 
