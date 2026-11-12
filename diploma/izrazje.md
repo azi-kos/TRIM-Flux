@@ -29,3 +29,10 @@ Vsak pojem v diplomi poimenujemo vedno enako (Navodila FKKT 2026: »isti pojem v
 | modaliteta | | *modality* | RNA, TCR, metabolna aktivnost |
 | prepis (mRNA) | transkript | *transcript* | |
 | mikrokapljica | droplet | *droplet* | |
+| vektor pogoja | vložitev stanja, state embedding | *condition embedding* | vektor za tkivo, čas vzorčenja ali bolnika (128 razsežnosti) |
+| kontrastna izguba | | *contrastive loss* | člena $\mathcal{L}_{\mathrm{ist}}$ in $\mathcal{L}_{\mathrm{razl}}$ v Metodah |
+| kos (celic) | batch, šarža | *chunk* | 5000 celic, ki jih je scFEA obdelal skupaj; »paket« je v tem delu rezerviran za učni paket |
+| paket (pri učenju) | batch | *mini-batch* | velikost paketa 4096 |
+| matrika zamenjav | confusion matrix | *confusion matrix* | |
+| Youdenov indeks | | *Youden's index* | |
+| modul (scFEA) | | *module* | 168 modulov, fluks skozi modul |

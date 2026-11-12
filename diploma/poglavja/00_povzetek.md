@@ -53,14 +53,19 @@ Seznam uporabljenih kratic in simbolov
 | CTLA-4 | antigen 4, povezan s citotoksičnimi limfociti T (angl. *cytotoxic T-lymphocyte-associated protein 4*) |
 | FBA | analiza ravnotežja fluksov (angl. *flux balance analysis*) |
 | GEM | genomski metabolni model (angl. *genome-scale metabolic model*) |
+| GEO | zbirka podatkov o izražanju genov (angl. *Gene Expression Omnibus*) |
 | GPR | gen–protein–reakcija (angl. *gene–protein–reaction*) |
 | HNSCC | ploščatocelični karcinom glave in vratu (angl. *head and neck squamous cell carcinoma*) |
+| kNN | metoda $k$ najbližjih sosedov (angl. *k-nearest neighbours*) |
+| NN | nevronska mreža, tu večplastni perceptron (angl. *neural network*) |
 | PCA | analiza glavnih komponent (angl. *principal component analysis*) |
 | PD-1 | receptor programirane celične smrti 1 (angl. *programmed cell death protein 1*) |
 | ROC | krivulja delovanja sprejemnika (angl. *receiver operating characteristic*) |
+| scFEA | analiza fluksov v posameznih celicah (angl. *single-cell flux estimation analysis*) |
 | scRNA-seq | sekvenciranje RNA posameznih celic (angl. *single-cell RNA sequencing*) |
 | scTCR-seq | sekvenciranje receptorjev celic T posameznih celic (angl. *single-cell T-cell receptor sequencing*) |
 | TCR | receptor celic T (angl. *T-cell receptor*) |
 | TRIM | model za združevanje TCR in RNA (angl. *TCR-RNA Integrating Model*) |
+| UMAP | enakomerna aproksimacija in projekcija mnogoterosti (angl. *uniform manifold approximation and projection*) |
 | UMI | edinstveni molekulski identifikator (angl. *unique molecular identifier*) |
 | VAE | variacijski avtokodirnik (angl. *variational autoencoder*) |
