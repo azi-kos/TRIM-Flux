@@ -1,287 +1,175 @@
-# Laboratorijski dnevnik — TRIM-Flux
+# Laboratorijski dnevnik – TRIM-Flux
 
-Diplomska naloga, FKKT/FRI, Univerza v Ljubljani  
-Mentor: prof. Miha Moškon  
-Avtor: Aljaž Koš
+Diplomsko delo, UL FKKT  
+Mentor: prof. dr. Miha Moškon  
+Avtor: Aljaž Kos
 
----
-
-## 28.4.2026 — Vzpostavitev repozitorija
-
-### Kaj sem naredil
-Naredil fork originalnega TRIM repozitorija (uhlerlab/TRIM) na GitHub pod računom azi-kos/TRIM-Flux. Repozitorij sem klonal lokalno in nastavil dva remote-a: `origin` (moj fork) in `upstream` (original). Ustvaril sem 4 branche: `main`, `replicate-original`, `flux-extension`, `rna-flux`.
-
-### Opažanja in rezultati
-- Repozitorij vsebuje originalno kodo: `trim.py` (glavni VAE model), `learn_tcr_embedding.py` (CNN za TCR), `analysis/` (evaluacijske skripte)
-- `.mm` fajlov ki jih originalna koda bere ni na GEO — avtorji so objavili `data_processing.py` kot primer kako iz surovih podatkov narediti vhodne `.pkl` fajle
-- GEO dataset GSE200996 vsebuje: `.h5` fajle (RNA count matrike), `filtered_contig_*.csv.gz` (TCR sekvence), `*meta.data.txt` (metadata po celici)
+Dnevnik sem 12. 11. 2026 skrajšal. Datumi in vsebina vnosov so ostali enaki, popravki so v zadnjem vnosu. Prejšnja daljša različica je v zgodovini repozitorija (commit 678cb41). Pri programiranju in pisanju dnevnika sem uporabljal orodje UI (Claude).
 
 ---
 
-## 1.5.2026 — Preprocessing podatkov
+## 28. 4. 2026 – Repozitorij
 
-### Kaj sem naredil
-Napisal in dokončal preprocessing notebook (`notebooks/01_preprocessing.ipynb`) ki iz surovih GEO podatkov naredi `.pkl` fajle za TRIM. Pipeline naloži RNA `.h5` fajle z `scanpy`, poveže barcodes z metadata, filtrira T celice, naloži TCR kontige, zgradi indekse in shrani vse potrebne fajle.
+Naredil sem fork uhlerlab/TRIM (azi-kos/TRIM-Flux), remota `origin` in `upstream` ter veje `main`, `replicate-original`, `flux-extension` in `rna-flux`.
 
-### Opažanja in rezultati
-- **Barcode kolizija**: isti 16-bazni barcode se pojavi pri več pacientih (ker so multipleksirani). Rešitev: povsod uporabljamo kompozitni ključ `(barcode_clean, Patient_ID)` namesto samega barcoda.
-- bili so vmesni probelmi z RAM crashi, vendar je bilo to popravljeno
-- **TCR dedupliciranje**: `drop_duplicates` je moral priti šele po združitvi vseh fajlov in po dodelitvi `Patient_ID`, sicer so se barcodi različnih pacientov pomešali. Globalni sort po UMI pred `drop_duplicates` zagotovi da obdržimo sekvenco z največ dokazi.
-- **Originalni pipeline ima 8 stolpcev** v `data_labels`, ne 4: `Tissue, Treatment Stage, SubCellType, Patient, CDR3(Beta1), tcr_v, tcr_j, treatment`. Vse `analysis/` skripte in oba modela jih unpacked po poziciji. Dodali smo manjkajoče stolpce: `SubCellType` (CD4=0, CD8=1 iz `CellClass`), `tcr_v`/`tcr_j` (indeksi V in J genov iz TCR kontigov), `treatment` (0 — v originalu nikoli definiran, nikjer se ne uporablja).
+- V repozitoriju so `trim.py` (VAE), `learn_tcr_embedding.py` (CNN za TCR) in `analysis/`.
+- Datotek `.mm`, ki jih bere originalna koda, na GEO ni. Avtorji so dali `data_processing.py` kot primer, kako narediti vhodne `.pkl`.
+- GSE200996 ima `.h5` (RNA), `filtered_contig_*.csv.gz` (TCR) in `*meta.data.txt`.
 
-### Rezultat
-- `data_rna.pkl`: sparse matrika `(146776, 36601)`, log1p normalizirana
-- `data_labels.pkl`: DataFrame `(146776, 8)` — vsi stolpci v pravilnem vrstnem redu
-- `df_all_tcrs.pkl`: `48103` unikatnih CDR3β sekvenc, paddane na enako dolžino
+## 1. 5. 2026 – Predobdelava
 
----
+Notebook `01_preprocessing`: nalaganje `.h5` s scanpy, povezava z metapodatki, celice T, kontigi TCR, indeksi, shranjevanje `.pkl`.
 
-## 1.5.2026 — TCR embedding (CNN avtoencoder)
+- Ista barkoda se pojavi pri več bolnikih (multipleksiranje), zato uporabljam ključ (`barcode_clean`, `Patient_ID`).
+- Vmes je zmanjkovalo RAM-a, to sem rešil.
+- `drop_duplicates` za TCR mora biti po združitvi datotek in dodelitvi bolnika. Pred tem razvrstim po UMI, da ostane kontig z največ dokazi.
+- `data_labels` ima v originalu 8 stolpcev, ne 4. Dodal sem `SubCellType` (CD4 = 0, CD8 = 1), `tcr_v`, `tcr_j` in `treatment` (0, v originalu se ne uporablja).
 
-### Kaj sem naredil
-Prepisal `learn_tcr_embedding.py` v notebook (`notebooks/02_tcr_embedding.ipynb`) in pognal na Colabu A100. Zamenjal `PCA` z `TruncatedSVD` (sparse matrika).
+Rezultat: `data_rna.pkl` (146776 × 36601, log1p), `data_labels.pkl` (146776 × 8), `df_all_tcrs.pkl` (48103 CDR3β).
 
-### Rezultat
-- 50100 korakov, loss konvergiral: ~0.01 → ~0.0001
-- `data_tcr.pkl`: `(146776, 100)` — TCR embeddingi za vsako celico
-- UMAP ne kaže ločevanja po tkivu/fazi — pričakovano, ker CNN trenira samo na rekonstrukciji sekvence, ne na biološkem kontekstu. Ločevanje bo naloga TRIM VAE.
+## 1. 5. 2026 – Vložitev TCR
 
----
-## 13.5.2026 — TRIM VAE trening (pacient 0)
+`learn_tcr_embedding.py` sem prepisal v `02_tcr_embedding` in ga pognal na Colabu (A100). PCA sem zamenjal s `TruncatedSVD` zaradi redke matrike.
 
-### Kaj sem naredil
-Prepisal `trim.py` v notebook (`notebooks/03_trim.ipynb`) s prilagoditvami za Colab A100 (argparse → spremenljivke, `cuda:1` → `cuda:0`, `PCA` → `TruncatedSVD`, `os.mkdir` → `os.makedirs`). Pognal trening za heldout pacienta 0 (leave-one-out).
+- 50100 korakov, izguba z ~0.01 na ~0.0001.
+- `data_tcr.pkl`: 146776 × 100.
+- UMAP ne loči po tkivu in fazi. To je pričakovano, ker se CNN uči samo rekonstrukcije zaporedja.
 
-### Težave
-- **Pseudo-kloni (pairwise L1 razdalje na 146k × 146k)**: preveč RAM in časa. Rešeno z vzorcem 100k celic — threshold kalibriran na vzorcu, vrednost (`thresh_fitted=1.89`) shranjena v `args.txt`.
-- **UMAP transform** na vseh 146k napovedih precount — rešeno z `preds_rna[mask_leave_out]` (samo heldout celice).
-- `preds.npz` je bil prvič shranjen prazen (shranjevanje zakomentirano) — ponovljen zagon z naloženim `model.pth`.
+## 13. 5. 2026 – Trening TRIM (bolnik 0)
 
-### Rezultat
-- 20000 korakov, loss konvergiral: `1.092 → 0.108`
-- `model.pth` shranjen pri korakih 10000 in 20000
-- `preds.npz`: `preds_rna` in `preds_tcr` za heldout pacienta 0
-- UMAP vizualizacija v teku
+`trim.py` sem prepisal v `03_trim` (argparse v spremenljivke, `cuda:0`, `TruncatedSVD`, `os.makedirs`) in učil z izpuščenim bolnikom 0.
 
----
+- Matrika razdalj L1 za psevdoklone na 146k celicah ne gre v RAM. Prag sem umeril na vzorcu 100k celic (`thresh_fitted` = 1.89).
+- UMAP transform delam le na celicah izpuščenega bolnika.
+- `preds.npz` se prvič ni shranil (zakomentirano). Ponovil sem z naloženim `model.pth`.
 
-## 20.6.2026 — Diagnoza prvih rezultatov in popravek reducerja (veja `replicate-original`)
+Rezultat: 20000 korakov, izguba 1.092 do 0.108, `model.pth` pri 10000 in 20000, `preds.npz` za bolnika 0.
 
-### Diagnoza
-Pregled `umap_rna_patient0.png` je pokazal prazna Tumor panela in ne-prekrivanje napovedi z realnimi celicami. Analiza je razkrila:
-- **Pacient 0 nima tumorskih celic** (Blood-Pre=571, Blood-Post=449, Tumor=0) — prazna panela nista bug, ampak napačna izbira heldouta. Le 4 pacienti (P18, P19, P24, P27) imajo vse 4 kvadrante; 22 ima Tumor-Post. Najboljši heldout: P24 (8152 Tumor-Post celic).
-- **Trening je zdrav** — loss lepo konvergira (0.285 → 0.108), RNA rekonstrukcija pa je najšibkejši člen (0.329 → 0.218), kar kaže na necentriran SVD prostor.
-- **Reducer neujemanje**: notebooka sta uporabljala `TruncatedSVD` (necentriran), original (`trim.py`, `analysis/`) pa `sklearn.PCA` (centriran). Napovedi so zato v drugem prostoru kot pri originalu; pri evalvaciji z `analysis/2.2.eval_gen.py` (ki naredi svoj PCA) bi to dalo nesmiselne rezultate.
+## 20. 6. 2026 – Diagnoza prvih rezultatov, PCA namesto SVD
 
-### Kaj sem naredil (P1)
-- `02_tcr_embedding.ipynb` in `03_trim.ipynb`: zamenjal `TruncatedSVD` → `sklearn.PCA(100)` na gosti `float32` matriki (sparse → dense, `del` + `gc` za RAM). Vrh ~40-50 GB, varno pri High-RAM.
-- Shranjevanje **PCA objekta** (`rna_pca.pkl`), da evalvacija dela v istem prostoru (`inverse_transform`).
-- Opozorilo: pred ponovnim zagonom je treba **izbrisati star SVD cache** (`data_rna_pca.pkl`, `umap_trained_rna.pkl`) na Drive.
+- Bolnik 0 nima tumorskih celic (kri pred 571, kri po 449, tumor 0). Vse štiri skupine imajo le P18, P19, P24 in P27. Za izpuščenega sem izbral P24 (kri pred 1548, kri po 2109, tumor pred 5568, tumor po 8152).
+- Izguba konvergira (0.285 do 0.108). Najslabša je rekonstrukcija RNA (0.329 do 0.218).
+- Notebooka sta uporabljala `TruncatedSVD` (necentriran), original pa `sklearn.PCA`. V 02 in 03 sem dal `PCA(100)` na gosti float32 matriki (do 40–50 GB RAM) in shranil `rna_pca.pkl`. Star SVD cache na Drive je treba zbrisati.
+- `tcr_dists` se ne shranjuje (146776² × 8 B ≈ 172 GB). Tudi original ga ne shrani.
+- `01`: `df_all_tcrs` dobi 4 stolpce z velikostjo klona po skupinah, kot v `data_processing.py:115-135`, poravnano na obstoječi indeks. Preverjeno: (48110, 4), vsota 146776. Brez tega so originalne metrike ekspanzije padle.
+- `03` cell-25: `tcr_dists` in `get_pseudoclones` računam samo na celicah izpuščenega bolnika (P24: 17377 celic, 2.42 GB). `get_pseudoclones` primerja le celice istega bolnika in tkiva, zato so psevdokloni enaki kot s polno matriko. Colab ima ~83 GB RAM.
+- P24 ima 1548 celic kri pred in 497 klonov za umerjanje praga.
 
-### Kaj sem naredil (P4)
-- `03_trim.ipynb`: `heldout_patient = [24]` namesto `[0]`. P24 ima vse 4 kvadrante (Blood-Pre 1548, Blood-Post 2109, Tumor-Pre 5568, Tumor-Post 8152) — smiseln za evalvacijo. Rezultati gredo v `holdout24`.
+Naprej: originalne metrike iz `analysis/HNSCC` na P24, `df_all_tcrs.pkl` znova narediti z 01.
 
-### Opomba: P3 odpade
-Prvotno načrtovan P3 (shrani `tcr_dists` v `preds.npz`) je nesmiseln: `tcr_dists` je `pairwise_distances(preds_tcr)` čez vseh ~146k celic = 146776² × 8B ≈ **172 GB**. Original ga zato v `trim.py` **ne shrani** (zakomentiran v `np.savez`). `2.2.eval_gen.py:184` ga sicer bere, a je to nekonsistentna/mrtva koda v originalu. `our_expansion_prediction` (helpers.py) razdalje računa interno na majhnih generiranih podmnožicah. Notebook 03 torej že sledi originalu — `tcr_dists` se NE shranjuje.
+## 20. 6. 2026 – Notebook 04: vrednotenje ekspanzije
 
-### Kaj sem naredil (P2)
-- `01_preprocessing.ipynb`: `df_all_tcrs` dobi 4 count stolpce (`'1'..'4'` = klonska velikost po kondiciji: blood-pre, blood-post, tumor-pre, tumor-post), kot original (`data_processing.py:115-135`). Counte izpeljem iz `data_labels` (CDR3(Beta1) × Tissue × Treatment Stage) in jih **poravnam na obstoječi vrstni red** `df_all_tcrs.index` (NE sortiram — sicer se TCR indeksi razsujejo). NaN za kondicije brez pojavitve (eval dela `.fillna(0)`).
-- Preverjeno na dejanskih podatkih: `(48110, 4)`, vsota countov = 146776 = št. celic. Eval-stil dostopi (`iloc[:,1]>iloc[:,0]`, `.sum(axis=1)`) delajo.
-- **Brez tega so njihove metrike ekspanzije (clont_count, expansion ROC) crashale.** Zdaj originalne `analysis/` metode tečejo skoraj nespremenjene.
+`04_expansion_eval` za enega izpuščenega bolnika (P24), logika iz `analysis/HNSCC/helpers.py`:
 
-### Kaj sem naredil (pseudo-kloni — crash fix)
-- `03_trim.ipynb` cell-25: `tcr_dists` se je računal na **vseh ~146k celicah** (`pairwise_distances(preds_tcr, preds_tcr)`) = 146776² × 8B ≈ **172 GB → crash** (isto kot 13.5.). Original to računa na 2 TB stroju; Colab High-RAM ima le ~83 GB system RAM (A100 80GB je VRAM, ne system RAM), zato večji Colab to ne reši.
-- **Popravek:** `tcr_dists` + `get_pseudoclones` zdaj delata **samo na heldout celicah** (P24 = 17377 celic → matrika 2.42 GB). Ker `get_pseudoclones` maskira `dists[i]` na isti `patient`+`bloodtumor`, je rezultat za heldout celice **identičen** polni matriki, brez odpadka. `pseudo_tcrs` se razširi nazaj na polno dolžino (-10 placeholder), da `preds.npz[mask_leave_out]` deluje.
-- Preverjeno: P24 ima 1548 blood-pre celic, 497 unikatnih klonov za kalibracijo `thresh` (dovolj), vse 4 kondicije prisotne.
+- `baseline_expansion_prediction_single` (helpers.py:284): kNN in NN na RNA, TCR in obojem.
+- `our_expansion_prediction_single` (helpers.py:395): iz z celic kri pred generira celice v štirih skupinah, prešteje psevdoklone (`thresh_fitted/2`) in primerja z resničnimi kloni.
+- AUC kot v `2.2.eval_gen.py:569-575`: x = kri po > kri pred, y = razmerje psevdoklonov po/pred.
 
-### Naslednji korak
-- P5: pognati originalne evalvacijske metrike iz `analysis/HNSCC/` (clont_count_by_cluster Pearson r, diversity r) na novih `preds.npz` (heldout P24). Treba: prilagoditi vhode (`.pkl`, `ID_NULL_TCR=-1`, en heldout namesto 27, PCA cache).
-- **Pomembno:** `df_all_tcrs` zdaj ima stolpce — pred ponovnim zagonom notebooka 02/03 ni potrebnih sprememb (oba bereta le `.index`), a `df_all_tcrs.pkl` na Drive je treba **regenerirati z notebookom 01**.
+Prilagoditve: `.npz` v `.pkl`, `ID_NULL_TCR` −1, poti na Drive, brez `tcr_dists`.
 
----
+Lokalni preizkus s simuliranimi števili: osnovni modeli 1503 testnih celic in 60 ekspandiranih, naš model 1548 celic in 69 ekspandiranih. Poravnava `recon_*_z` z oznakami se ujema. En bolnik je šibka statistika, pozneje več bolnikov.
 
-## 20.6.2026 — Notebook 04: evalvacija klonske ekspanzije (Figure 4)
+## 27. 6. 2026 – Fluksi: izbira orodja in preizkus scFEA
 
-### Kaj sem naredil
-Ustvaril `notebooks/04_expansion_eval.ipynb` — evalvacija napovedi klonske ekspanzije za **enega heldout pacienta naenkrat** (P24). Logika **prekopirana iz originala** (`analysis/HNSCC/helpers.py`), prilagojena na študentove vhode:
-- **`baseline_expansion_prediction_single`** (iz `helpers.py:284`): navaden klasifikator (kNN/NN × rna/tcr/both) na realnih blood celicah → ROC AUC. Ne rabi modela.
-- **`our_expansion_prediction_single`** (iz `helpers.py:395`): iz blood-pre `z` heldout pacienta generira celice v 4 kondicijah, šteje pseudo-klonalnost (`thresh_fitted/2`), primerja z resnično (`df_all_tcrs` counti).
-- **Končna ROC AUC** (iz `2.2.eval_gen.py:569-575`): `x = blood-post > blood-pre` (resnica), `y = pseudo BA/BB` (napoved).
+Replikacijo sem združil v `main`, vse veje so na `fe529ff`. Fluksi gredo naprej na `flux-extension`.
 
-### Premoščena neujemanja (original → študent)
-`.npz`→`.pkl`, `data_labels` DataFrame→`.values`, `ID_NULL_TCR` 0→-1, trde poti→Drive, globalni scope, `Generator()` brez args (študentova verzija), **izpuščen mrtvi `tcr_dists`** (helpers.py:446).
+Orodja za Var 2 (RNA + TCR + fluks) na 146776 celicah. Prvi predlog (CLAUDE.md) je bil iMAT/ftINIT.
 
-### Validacija (lokalno, s simuliranimi P2 counti)
-- JSON + sintaksa vseh celic: OK
-- Baseline P24: train 56795 celic, test 1503 (po OOD filtru), **60 ekspandiranih → ROC definiran**
-- Our P24: 1548 blood-pre, `real_clon` (1548,4), **69 ekspandiranih → ROC definiran**
-- Poravnava `recon_*_z` (03 `mask_leave_out`) ↔ `x_label_ho` (04): identična ✅
+- Compass: ~30 min na vzorec, za posamezne celice prepočasen, ne sprejme zunanjega GEM.
+- ftINIT (RAVEN, MATLAB): naredi model za kontekst, ne fluksov po celicah.
+- scFEA: izbran. Po celicah, GPU, 168 modulov. V članku robusten na dropout (r > 0.85).
+- Znotraj zagona je determinističen, seme je treba fiksirati. Celic ne meša, ker fluks računa iz ekspresije celice.
 
-### Pogoji za zagon (Colab)
-- `holdout24/preds.npz` z `recon_*_z` (cell-27 mora teči po pseudo-klonih)
-- `df_all_tcrs.pkl` na Drive = **P2-verzija** (regeneriraj z notebookom 01 — lokalna kopija je še stara, brez countov)
-- Per-patient: ROC na enem pacientu = šibka statistika; agregat čez 3-5 pacientov kasneje (razširi `output_folders`)
+Naredil sem `01_scfea_demo`: 2000 celic P24, preverba orientacije in imen genov, merjenje časa, pregled izhoda.
 
----
+Odprto: ali so v `data_rna` simboli ali Ensembl ID, imena `module_gene` in `cmMat`. Fluksi scFEA so relativni in odvisni od modela.
 
-## 27.6.2026 — Flux razširitev: raziskava izvedljivosti + scFEA demo (veja `flux-extension`)
+## 28. 6. 2026 – Prazne celice v podatkih RNA
 
-### Merge
-Vse replikacijsko delo (P1, P2, P4, pseudo-fix, notebook 04) mergano v `main` (fast-forward). Vse veje (`replicate-original`, `flux-extension`, `rna-flux`) poravnane na `fe529ff`. Flux delo se nadaljuje na `flux-extension`.
+Na vzorcu 300 celic P24 (`data_rna_sample.pkl`) je ~30 % praznih celic (kri 34 %, tumor 26 %). Original bere že filtrirane `.mm`, zato v 01 manjka QC.
 
-### Raziskava izvedljivosti flux pipeline
-Cilj Var 2 (RNA+TCR+Flux). Vhod: 146776 T-celic. Raziskal orodja (CLAUDE.md je predlagal iMAT/ftINIT — suboptimalno):
-- **Compass** (FBA): ~30 min/vzorec → per-cell na 147k = leta. NE sprejme zunanjega GEM. Izključen.
-- **ftINIT** (RAVEN/MATLAB): gradi context-specific MODEL, ne per-cell flux. Ni naš pipeline.
-- **scFEA** (GNN, GPU): IZBRAN. Per-cell, GPU-pospešen, ~168 modulov za človeka. Dropout-robusten (korelacija >0.85 pri simuliranem dropoutu, testirano v članku). Ne klasificira celičnega tipa → ne meša celic. Brez poolanja.
+Po literaturi (Luecken in Theis, 10x, EmptyDrops) sem dodal `min_genes = 200`. Po ponovnem zagonu vseh notebookov so rezultati boljši.
 
-### Razčiščene skrbi (vse iz virov)
-- Determinizem: znotraj zagona da; fiksiraj seed. Stabilnejši od Compass (LP ima več optimumov).
-- Mešanje celic: nemogoče — flux iz lastne ekspresije, ne klasifikacije.
-- ftINIT→Compass ideja odpadla: Compass ne sprejme zunanjega modela.
+## 4. 7. 2026 – Pregled predobdelave na surovih .h5
 
-### Kaj sem naredil
-Ustvaril `notebooks_flux/01_scfea_demo.ipynb` — proof-of-concept: namesti scFEA, vzame 2000 celic (P24), preveri orientacijo (geni×celice) + gene imena (simboli vs Ensembl), požene scFEA, **izmeri čas** → ekstrapolacija na cel dataset, pregleda flux izhod (celice × ~168 modulov).
+- Normalizacija: 01 je delal samo log1p surovih števil (0 do ~11). Avtorji (`data_processing.py:49-58`) naredijo log(x + eps), po celici odštejejo minimum in delijo z maksimumom (izraženi geni ~0.84–1.0, ničle ostanejo 0). To sem implementiral za redko matriko. Razlika z avtorjevo različico je največ 8e-8. Surova števila shranim v `data_rna_counts.pkl` za flukse.
+- Ključ (`barcode_clean`, `Patient_ID`) ne loči tkiva in faze: 102 ključa sta v krvi in tumorju, 141 v več fazah. Okoli 283 celic (0.3 %) ima lahko napačno tkivo ali fazo. Nisem popravil.
+- V cell-22 sem dodal assert za razpon `data_rna`. Flux demo naj bere `data_rna_counts.pkl`.
 
-### Odprto / pred zagonom
-- Preveri **gene imena** v `data_rna` (scFEA rabi simbole, ne Ensembl ID); če Ensembl → pretvorba (mygene/pybiomart).
-- Preveri točna imena `module_gene` + `cmMat` v scFEA `data/` (auto-detekcija v cell-11).
-- Pridržek za diplomo: scFEA fluksi so RELATIVNI, model-odvisni; benchmark scFEA/Compass/METAFlux ne obstaja.
+## 28. 6. 2026 (zvečer) – TRIM deluje, AUC 0.77
 
----
+P24 po popravkih (normalizacija, QC): AUC 0.773, osnovni modeli ~0.5 (najboljši knn_rna 0.53). Prej 0.52.
 
-## 28.6.2026 — scFEA debug saga + KRITIČNA najdba: prazne tumorske RNA celice
+- Spearman med napovedjo in resnico 0.442 (prej 0.019).
+- Klonalnost: kri pred rho 0.375, kri po 0.331 (prej 0.079).
+- P24 po QC: kri pred 523, kri po 709, tumor pred 1889, tumor po 2796.
 
-### KRITIČNA najdba (prek data_rna_sample.pkl, 300 celic P24)
-- Čez dataset ~30% praznih v OBEH tkivih (blood 34%, tumor 26%)
-- Original `data_processing.py` bere že-filtrirane `.mm` (ne na GEO) → **QC korak manjka v notebooku**.
+## 28. 7. 2026 – AUC 0.87 z avtorjevo normalizacijo in filtrom mito
 
-### Popravek: QC filtriranje
-Raziskava (Luecken & Theis, 10x, EmptyDrops) sm ugotovil, da je pametno nastaviti na QC `min_genes=200` kot enostavno merilo za neprazne droplete.
+P24 z avtorjevo normalizacijo in mito % < 20: AUC 0.87 (prej 0.77 z log1p). Najboljši osnovni model knn_both 0.66.
 
-Po nastavitvi in ponovnem teku vseh notebookov, so se rezultati izboljšali.
+- Youden: recall EXP 0.78 (18/23, prej 0.61), precision 0.51 (prej 0.39), F1 0.62 (prej 0.47). F1 NOT 0.98.
+- Spremenil sem dve stvari hkrati. Večji vpliv ima verjetno normalizacija. Filter mito odstrani 2354 celic (1.4 %), mediana mito je 3.7 %.
+- 23 pozitivnih, interval zaupanja okoli ±0.1. Za trdnejši sklep rabim več bolnikov.
+- ROC je še vedno odrezana zaradi celic z y = 0.
+- `pip install --upgrade` je namestil pandas 3, `.pkl` iz pandas 3 se v pandas 2 ne odpre. Brez `--upgrade`, povsod pandas 2.
 
----
+## 30. 7. 2026 – Prvi izračun fluksov
 
-## 4.7.2026 — Pregled pipeline-a (empirična verifikacija na surovih .h5) + popravki
+scFEA ni vzdrževan, zato sem ga prilagodil na pandas 3 (`._append` v `concat`) in vektoriziral pripravo podatkov. Približno 70000 celic na A100: prej 18 h, potem 1 h. Vrednosti so neničelne in na prvi pogled smiselne.
 
+Naprej: kodirnik in dekodirnik za flukse.
 
-### Najdba 1 — napačna normalizacija RNA
-`01` cell-18 je delal **samo `log1p(surovi counti)`** (razpon 0..~11). Avtorjev
-`data_processing.py:49-58 library_size_normalize` dela per-celico **`log(x+eps)` → odštej
-per-cell min → deli s per-cell max** → izraženi geni v **~[0.84, 1.0]**, ničle ostanejo 0.
-To je popolnoma drug vhodni prostor; TRIM (VAE + PCA + λ uteži + eval) je umerjen za avtorjev
-vhod.
-- Popravek (cell-18): implementiral avtorjevo normalizacijo **sparse-ohranjajoče & vektorizirano**
-  (ker ima vsaka celica ničelne gene, je per-cell min vedno `log(eps)` → ničle ostanejo 0).
-  Lokalno verificirano proti avtorjevi dense referenci: **max razlika 8e-8** ✅.
-- Surove counte za flux shranim **ločeno** kot `data_rna_counts.pkl` (flux notebook naj bere
-  tega, NE več `expm1(data_rna)` — to bi zdaj vrnilo napačno).
+## 30. 7. 2026 – Var 1 (fluks + TCR, brez RNA)
 
-### Najdba 2 (nerešeno) — kompozitni ključ brez tkiva/faze
-Ključ `(barcode_clean, Patient_ID)` v cell-11 ne loči tkiva/faze. Čez cel metadata **102
-ključev kaže na kri IN tumor, 141 na >1 Stage** (kolizije barkod med vzorci istega pacienta).
-`keep='first'` → ~283 celic (0,3 %) dobi napačno oznako tkiva/faze. Majhno; možen popravek:
-`Tissue_str`/`Stage` označi iz imena `.h5` datoteke in ju vključi v ključ. Ni implementirano
-(brez lokalne validacije bi bilo tvegano); zabeleženo za kasneje.
+Fluks namesto RNA v TRIM (`03_trim_flux`, `04_expansion_eval_flux`).
 
-### Posledica za projekt
-- Po popravkih naj `data_rna` da neničelni razpon ~0.8..1.0 (assert dodan v cell-22).
-- Flux (`notebooks_flux/01_scfea_demo.ipynb`): posodobi vhod na `data_rna_counts.pkl`.
+- Pri prvem treningu je bila izguba rekonstrukcije fluksa 0.000, model je fluks prezrl. Fluksi scFEA so majhni (povprečje ~0.006), izguba TCR pa ~0.15–0.3. RNA tega nima zaradi normalizacije in PCA na visoko variabilnih genih. Rešitev: z-standardizacija po modulih, mean(x²) z 0.0003 na 0.99. Povprečja in std so v `flux_standardize.pkl`.
+- P24: fluks + TCR AUC 0.70, RNA + TCR 0.87, NN_both 0.61. Youden: recall EXP 0.70, precision 0.11 (4.4 % ekspandiranih).
 
----
+Fluks je nad osnovnim modelom in pod RNA + TCR.
 
-## 28.6.2026 (zvečer) — USPEH: TRIM deluje (AUC 0.77) + dogovor za naprej
+## 11. 8. 2026 – Var 2 (RNA + fluks + TCR), pregled kode, priprava ponovitev
 
-### Rezultat po re-runu (heldout P24)
-Po popravkih (normalizacija + lahek QC) je TRIM ekspanzija **ROC AUC = 0.773**, baseline vsi ~0.5 (najboljši knn_rna 0.53). **TRIM premaga baseline** — replikacija Fig 4 uspešna. Prej AUC 0.52 (≈ naključje).
-- Spearman rho napovedi vs resnica: **0.442** (prej 0.019) — signal odklenjen.
-- Klonalnost korelacija: blood-pre rho=0.375, blood-post rho=0.331 (prej 0.079).
-- P24 po QC: Blood-Pre 523, Blood-Post 709, Tumor-Pre 1889, Tumor-Post 2796 (najboljši heldout od vseh).
+P24, en zagon: AUC 0.954, recall EXP 1.0 (23/23), precision 0.40.
 
----
+Kodo sem pregledal z orodji UI in jo primerjal z originalom. Uhajanja oznak ni.
 
-## 28.7.2026 — AUC 0.87: avtorjeva normalizacija + mito filter (opomba 2 potrjena)
+- Resnica x (velikosti klonov iz `df_all_tcrs`) ne vstopa v izgubo.
+- RNA in fluks vplivata na napoved prek skupnega z (povprečje `recon_rna_z`, `recon_flux_z`, `recon_tcr_z`), iz katerega dekodirnik TCR generira psevdoklone.
+- Recall 1.0 je posledica velikega deleža y = 0 (filter BB ≥ 2). Hanley-McNeil 95 % IZ [0.894, 1.0], razlika do 0.87 ni značilna (p ~ 0.14). En zagon pri n = 23 in nedeterminističnem treningu.
 
-### Rezultat (heldout P24, po avtorjevi normalizaciji + mito%<20)
-**TRIM ekspanzija ROC AUC = 0.87** (prej 0.77 z log1p). Baseline knn_both 0.66. **TRIM prepričljivo premaga baseline.**
-- EXP recall 0.61 -> **0.78** (ujame 18/23 ekspandiranih, prej 14)
-- EXP precision 0.39 -> **0.51** | EXP F1 0.47 -> **0.62**
-- NOT F1 0.97 -> **0.98** (skoraj popolno na neekspandiranih)
+Ponovitve:
 
-### Kaj je bilo spremenjeno (dvoje naenkrat)
-1. **Normalizacija**: log1p -> avtorjeva `library_size_normalize` (log+minmax -> [0.84,1.0]). Verjetno GLAVNI faktor — TRIM je umerjen za ta vhod. **OPOMBA 2 POTRJENA** (avtorjeva revizija je pravilno identificirala normalizacijo kot spregledan vzrok slabih rezultatov).
-2. **Mito filter** mito%<20: odstrani 2354 celic (1.4%). Mediana mito% 3.7% (zdrava T-celicna populacija). Verjetno majhen prispevek.
+- Seme sem dodal v trening, vrednotenje in flukse (`flux_seed`). Zdaj je ponovljivo.
+- Mape `runs/P{pid}/seed{s}/{variant}/`, skupni fluksi po semenih, shranjeni model, izgube in meta.
+- Diagnostika za izbor ≥ 5 bolnikov, funkcija za pooled ROC.
+- Načrt: 3 variante × ≥ 5 bolnikov × 3 semena.
+- Prag psevdoklonov umerjam le na celicah kri pred izpuščenega bolnika, original na `mask_train` vseh bolnikov. Razlog je pomnilnik. Zapisano v cell-25 vseh 03.
 
-### Pridržki
-- En pacient (23 pozitivnih) -> AUC 0.87 ima sirok interval zaupanja (±~0.1). Za trdno trditev rabis vec pacientov (agregat).
-- Prispevek norm vs mito NI locen (spremenjeno dvoje naenkrat). Za temeljitost bi ablacija locila.
-- ROC krivulja se vedno "odrezana" (y=0 mnozica), a strm del zdaj do TPR 0.78 (prej 0.6).
+## 12. 11. 2026 – Pregled kode in popravki
 
-### Stanje replikacije
-MOCNA: AUC 0.87, vs baseline 0.66, EXP recall 0.78, NOT F1 0.98, bimodalna QC dokazana, UMAP prekrivanje. Verjetno blizu/nad objavljenimi rezultati clanka. QC popoln: min_genes=200 (bimodalno) + mito%<20 + avtorjeva normalizacija.
+Pri pisanju diplome sem šel čez vso kodo in jo primerjal z dnevnikom. Podroben seznam je v `diploma/pregled_kode.md`.
 
-### Opomba: pandas 3 problem
-`!pip install --upgrade numpy scanpy scipy` je potegnil pandas 3 -> .pkl shranjen s pandas 3 se ne odpre s pandas 2 v drugih notebookih. Resitev: NE uporabljati --upgrade (Colab ima delujoc scanpy); ostati na pandas 2 povsod. Ce ze: uskladi verzijo + restart runtime v vseh notebookih.
+Avgust, dopolnjeno iz zapisov zagonov in gita:
 
----
+- 18. 8.: popravek v rna_tcr (globalni x se je prepisal, napaka v `log_run`).
+- 18.–19. 8.: zagoni P24 (rna_tcr semeni 0 in 1, flux_tcr in rna_flux_tcr semena 0–2). rna_tcr P24 seme 2 ni bil pognan.
+- 20. 8.: koda za Var 3 (RNA brez genov fluksov + fluks + TCR). Ni bila pognana.
+- 21.–22. 8.: zagoni P23, vse tri variante, semena 0–2. flux_tcr seme 0 sem pognal dvakrat (AUC 0.745 in 0.730).
+- 31. 8.: zapisi zagonov v `results/logs`.
 
-## 30.7.2026 - Fluxi so prvič uspešno izračunani
+Skupaj 17 zagonov na dveh bolnikih namesto ≥ 5 bolnikov.
 
-### Opis
-scFEA je nevronska mreža, ki na podlagi biološke relevantnosti pretvori RNA podatke (gene in njihove counte) v flux matriko. Ker je program neposodobljen, ga je bilo treba posodobiti na pandas 3.0. verzijo (specifično ._append -> .concat) in vektorizirati vmesne podatke za veliko hitrejše predpripravljanje podatkov pred treningom.
+Popravki prejšnjih vnosov:
 
-### Potek
-Na A100 80Gb je treniranje ~70.000 celic potekalo pre vektorizacijo v 18 urah, po vektorizaciji pa v 1 uri.
-
-### Rezultati
-Analiza kaže domnevno neničelne vrednosti, kot tudi biološo smiselnost rezultatov.
-
-### Naprej
-Izgradnja Flux encoderja in decoderja
-
----
-
-## 30.7.2026 - TRIM-Flux Var 1 (Flux + TCR, brez RNA)
-
-### Opis
-Flux vstavljen v TRIM kot zamenjava za RNA modaliteto TCR del.Vprašanje: ali metabolni flux sam nosi dovolj informacije za napoved klonalne ekspanzije? Notebooka `03_trim_flux` (trening) in `04_expansion_eval_flux` (evalvacija).
-
-### Problem in rešitev: flux se ni učil
-Prvi trening je pokazal flux recon loss = 0.000 -> model flux ignorira. Vzrok: scFEA flux je v majhni skali (mean ~0.006), zato MSE loss ~0.0001 izgubljen v TCR loss, ki je veliko večji (~0.15-0.3). RNA tega ni imel, ker gre skozi normalizacijo + PCA na visoko-variabilnih genih (komponente reda enot). Rešitev: **z-standardizacija fluxa po modulih** (vsak modul mean=0, std=1) -> mean(x^2) z 0.0003 na 0.99 -> flux loss primerljiv s TCR, model se enakovredno uči. Reverzibilno (shranjen mean/std v `flux_standardize.pkl`), brez izgube, ohrani interpretabilnost modulov.
-
-### Rezultati (P24)
-- **Flux + TCR: AUC = 0.70**
-- RNA + TCR (original): AUC = 0.87
-- Baseline (NN_both): AUC = 0.61
-- Confusion (Youden prag): EXP recall = 0.70, EXP precision = 0.11 (nizka precision = 4.4 % bazna stopnja ekspandiranih, ista neuravnoteženost kot pri RNA).
-
-### Interpretacija
-Flux je jasno nad baseline -> nosi realno informacijo o ekspanziji. A pod RNA+TCR -> ne nadomesti RNA. Biološko smiselno: flux (168 modulov) je kompresija RNA prek scFEA in ohrani velik del, a ne celotnega ekspanzijskega signala.
-
----
-
-## 11.8.2026 - Var 2 (RNA+Flux+TCR) rezultat + audit + Monte Carlo setup
-
-### Rezultat Var 2 (en zagon, P24)
-**RNA+Flux+TCR: AUC = 0.954, EXP recall = 1.0 (23/23), precision = 0.40.** Presega RNA+TCR (0.87) in Flux+TCR (0.70). Sumljivo dobro -> temeljit audit.
-
-### Audit (5 agentov + primerjava z originalom)
-NI leakage, koda cista (24 najdb, 0 kriticnih). Kljucno:
-- Resnica x (df_all_tcrs count stolpci) NIKOLI ne vstopi v trening loss. Ekspanzija je cisto post-hoc eval metrika.
-- x (resnica) in y (napoved) pravilno poravnana, y ne vidi x niti posredno.
-- **RNA/flux VSTOPATA v napoved posredno**: mu = mean(recon_rna_z, recon_flux_z, recon_tcr_z) -> z -> decoder_tcr -> out_tcr -> pseudo-kloni. Koncni izhod je TCR, a z nosi RNA+flux info. Zato flux legitimno lahko dvigne AUC.
-- recall=1.0 je re-izraz AUC (velika y=0 masa zaradi filtra BB>=2), ne dodatna trditev. Hanley-McNeil: 95% CI [0.894, 1.0]. Skok 0.87->0.954 NI signifikanten (p~0.14).
-
-**Zakljucek: 0.954 ni napaka, a je nezanesljiv (n=23, en zagon, nedeterministicen trening).**
-
-### Popravki za dokazljivost (Monte Carlo)
-- **Seed**: trening je bil popolnoma nedeterministicen (ni manual_seed) -> dodan seed v vse 3 trening + 3 eval + flux (flux_seed). Zdaj reproducibilno.
-- **Hierarhija**: `runs/P{pid}/seed{s}/{variant}/` + centralni deljeni flux(per-seed)/RNA/TCR. Shrani model + checkpointe + losses + meta.
-- **>=5 pacientov**: diagnostika notebook (kvadranti + ekspandirani kloni) -> izbor. Pooled ROC funkcija za agregacijo.
-- **Nacrt**: 3 variante x >=5 pacientov x 3 seedi -> mean+-std + pooled. Test: je Var 2 prednost konsistentna cez paciente ali le P24 (selection bias)?
-
-### Pridrzek: thresh kalibracija (razlika od originala)
-Nasa koda kalibrira thresh_fitted le na heldout blood-pre celicah (train_mask_ho), original trim.py na globalnem mask_train (vsi pacienti). Nasa je del crash-fixa (polna tcr_dists 146k^2 = 172 GB). Blaga kalibracija na test-time distribuciji; NE leaka blood-post (audit potrjen), a lahko rahlo vpliva na AUC. Dokumentirano v cell-25 vseh 03 notebookov.
-
----
+- 1. 5.: v kodi ni razvrščanja po UMI. Če ima celica več kontigov TRB, ostane prvi v datoteki.
+- 1. 5.: `data_rna` je bil log1p le do 4. 7. Končni nabor po QC in brez celic brez TCR ima 69930 celic.
+- 13. 5. in 20. 6.: prag se zdaj umeri na TCR, ki jih model generira iz naključnih z s pogoji celic izpuščenega bolnika, ne na vzorcu 100k celic. V 6 od 17 zagonov umerjanje pride do meje 50 ponovitev (prag 0.769), takrat prag ni umerjen.
+- 20. 6.: notebook 04 je v gitu od 26. 6.
+- 27. 6.: scFEA sem pognal po kosih po 5000 celic (14 kosov). Vsak kos ima svojo mrežo in svojo normalizacijo po celicah, zato je fluks celice odvisen od kosa. Vhod so samo geni modulov.
+- 28. 6. (zvečer): vnos sem dodal 28. 7., skupaj z vnosom 4. 7. Filter `min_genes = 200` je v gitu od 4. 7.
+- 30. 7.: PCA je na vseh genih, ne na visoko variabilnih. Fluksi so standardizirani na vseh celicah, tudi na izpuščenem bolniku. `flux_standardize.pkl` se ob vsakem zagonu prepiše.
+- 30. 7. in 11. 8.: osnovni modeli na fluksih (`knn_flux`, `NN_flux`) so v zapisih zagonov, kode zanje v repozitoriju ni. Shranjeni `04_expansion_eval_flux` ima starejšo različico z `x_rna`.
+- 11. 8.: `flux_seed` samo poimenuje izhodno mapo. scFEA ima v kodi `torch.manual_seed(16)`, zato se trije nabori fluksov razlikujejo le zaradi nedeterminizma GPU. Ponovljivo ni: isti zagon je dal 0.745 in 0.730, zagoni z različnimi semeni pa se značilno razlikujejo v 9 od 16 primerjav (DeLong, p < 0.05).
+- 11. 8.: AUC 0.954 se ni ponovil. rna_flux_tcr P24 s semeni 0–2 je dal 0.785 do 0.848.
