@@ -1,0 +1,7 @@
+razlicica,bolnik,n_semen,povprecje,sd,najmanj,najvec,izhodisce_najvec,zagonov_ip_nad_izhodisci,zagonov_tau_na_meji
+rna_tcr,23,3,0.8702,0.0770,0.7818,0.9230,0.5182,3,0
+flux_tcr,23,3,0.6669,0.1662,0.4760,0.7799,0.7334,1,1
+rna_flux_tcr,23,3,0.8531,0.0963,0.7419,0.9090,0.5182,3,0
+rna_tcr,24,2,0.8448,0.1012,0.7732,0.9163,0.6594,2,2
+flux_tcr,24,3,0.7740,0.1016,0.6587,0.8506,0.5033,3,3
+rna_flux_tcr,24,3,0.8130,0.0321,0.7847,0.8480,0.6594,3,0

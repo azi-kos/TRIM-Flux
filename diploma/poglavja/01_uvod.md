@@ -1,46 +1,85 @@
-<!-- Cilj obsega: ~8–9 strani. Pregled literature, od splošnega k specifičnemu, konča z vrzeljo, ki jo zapolni naše delo.
-     Vsaka trditev o biologiji/metodah mora imeti vir [@...]. Slike rišemo sami (»prirejeno po [n]«). -->
+<!-- UVOD (Navodila FKKT 2026 + navodila Biokemija v1.2 + kontrolni seznam wiki FKKT)
+     - največ 1/3 oštevilčenih strani (pri 30 straneh največ 10); cilj 8–9 strani skupaj s slikami
+     - pregled literature od splošnega k specifičnemu, konča s problemom, ki ga rešuje delo
+     - vsaka trditev ima vir; citat [n] pred ločilom; vsi DOI preverjeni v Crossref (11. 11. 2026)
+     - nov izraz brez slovenskega ustreznika: ob prvi pojavitvi angl. izraz v oklepaju
+     - brez trpnika, brez »s pomočjo«, decimalna vejica, ločilo tisočic nad 9999
+     - besedilo je neodvisno od izbire metode za flukse (scFEA ali kontekstno specifični model z ftINIT)
+     - mesta za lastne slike: slika 1 (klonska ekspanzija), slika 2 (TRIM), slika 3 (od matrike S do fluksov) -->
 
 # Uvod
 
 ## Imunoterapija raka in limfociti T
 
-<!-- - zaviralci imunskih kontrolnih točk (anti-PD-1), odziv le pri delu bolnikov
-     - HNSCC: klinični kontekst, neoadjuvantna imunoterapija (kohorta GSE200996)
-     - vloga CD8+ in CD4+ celic T v protitumorskem odzivu -->
+Imunski sistem lahko prepozna in uniči rakave celice, vendar tumorji med razvojem pridobijo mehanizme, ki protitumorski odziv zavrejo. Med najpomembnejšimi je izkoriščanje imunskih kontrolnih točk (angl. *immune checkpoints*), to je zaviralnih receptorjev na limfocitih T, ki v zdravem organizmu omejujejo trajanje in jakost imunskega odziva ter preprečujejo avtoimunost [@pardoll2012]. Najbolj raziskani sta receptor programirane celične smrti 1 (angl. *programmed cell death protein 1*, PD-1) ter antigen 4, povezan s citotoksičnimi limfociti T (angl. *cytotoxic T-lymphocyte-associated protein 4*, CTLA-4). Oba zavirata aktivacijo in delovanje celic T. Monoklonska protitelesa, ki ju blokirajo, to zavoro sprostijo in obnovijo protitumorsko delovanje limfocitov T [@pardoll2012; @ribas2018].
+
+Zaviralci imunskih kontrolnih točk so v zadnjem desetletju spremenili zdravljenje več vrst raka. Trajno korist od njih ima le del bolnikov, zato raziskovalci iščejo značilnosti tumorja in imunskega sistema, ki bi odziv napovedale pred zdravljenjem ali zgodaj med njim [@ribas2018; @chen2017]. Chen in Mellman sta protitumorski odziv opisala kot zaporedje korakov: predstavitev tumorskih antigenov, aktivacija in namnožitev specifičnih celic T, njihovo potovanje v tumor, vstop vanj ter prepoznava in uničenje rakavih celic. Pri vsakem bolniku se lahko ta cikel ustavi na drugem koraku, kar deloma pojasni, zakaj se bolniki na isto zdravljenje odzovejo različno [@chen2017].
+
+Glavni izvajalci protitumorskega odziva so citotoksične celice T CD8+, ki prepoznajo tumorske antigene, predstavljene na molekulah poglavitnega histokompatibilnostnega kompleksa razreda I, in ubijejo tarčno celico. Celice T CD4+ odziv usmerjajo in vzdržujejo, med drugim z izločanjem citokinov in s spodbujanjem aktivacije drugih imunskih celic [@chen2017].
+
+Ploščatocelični karcinom glave in vratu (angl. *head and neck squamous cell carcinoma*, HNSCC) izvira iz sluznice ustne votline, žrela in grla. Raka ustne votline in grla povezujejo predvsem s kajenjem in uživanjem alkohola, raka žrela pa vse pogosteje z okužbo s humanim papilomavirusom, zato HNSCC delimo na HPV-pozitivnega in HPV-negativnega [@johnson2020]. Ameriška Uprava za hrano in zdravila (angl. *Food and Drug Administration*, FDA) je za zdravljenje ponovljenega ali razsejanega HNSCC odobrila zaviralca PD-1 nivolumab in pembrolizumab [@johnson2020]. Nivolumab je v randomizirani raziskavi III. faze pri bolnikih, pri katerih je bolezen napredovala po kemoterapiji s platino, podaljšal celokupno preživetje v primerjavi s standardnim zdravljenjem [@ferris2016]. Pri bolnikih, ki se na zdravljenje odzovejo, so odzivi praviloma trajni, vendar se večina bolnikov ne odzove [@johnson2020; @ferris2016].
+
+Odziv imunskega sistema na zdravljenje lahko neposredno spremljamo pri neoadjuvantni imunoterapiji, ki jo bolnik prejme pred kirurško odstranitvijo tumorja. Ta pristop omogoča, da raziskovalci istemu bolniku odvzamejo kri in tumorsko tkivo pred zdravljenjem in po njem ter primerjajo imunske celice v obeh časovnih točkah [@luoma2022].
 
 ## Receptor celic T in klonska ekspanzija
 
-<!-- - V(D)J rekombinacija, raznolikost TCR, regija CDR3β kot glavni določevalec specifičnosti
-     - klon = celice z istim TCR; klonska ekspanzija po aktivaciji
-     - ekspanzija v krvi/tumorju po terapiji kot korelat odziva (literatura) -->
+Vsaka celica T nosi receptor celic T (angl. *T-cell receptor*, TCR), ki določa, kateri antigen bo prepoznala. Večina celic T ima receptor iz verig α in β. Gena za obe verigi nastaneta med razvojem celice T v priželjcu s somatsko rekombinacijo genskih segmentov V, D in J (rekombinacija V(D)J). Na stikih segmentov se pri tem naključno dodajajo in odstranjujejo nukleotidi, zato nastane izjemno raznolik repertoar receptorjev [@davis1988]. Največ raznolikosti je zbrane v tretji regiji, ki določa komplementarnost (angl. *complementarity-determining region 3*, CDR3). Ta regija se neposredno stika s peptidom, vezanim na molekulo poglavitnega histokompatibilnostnega kompleksa, zato regija CDR3 verige β velja za glavni določevalec specifičnosti receptorja in je najpogostejša tarča sekvenciranja repertoarja [@davis1988; @pai2021].
 
-## Sekvenciranje posameznih celic: scRNA-seq in scTCR-seq
+Ko celica T prepozna svoj antigen in prejme dodatne aktivacijske signale, se začne hitro deliti. Vse hčerinske celice nosijo enak TCR in skupaj tvorijo klon. Povečanje števila celic klona imenujemo klonska ekspanzija (angl. *clonal expansion*); je neposreden odraz antigensko specifičnega odziva [@pai2021]. Zaporedje TCR deluje kot naravna črtna koda, s katero lahko sledimo istemu klonu skozi čas in med tkivi, na primer med krvjo in tumorjem [@pai2021].
 
-<!-- - 10x Genomics 5' + V(D)J, kaj dobimo (matrika štetij, kontigi)
-     - kontrola kakovosti: prazne kapljice, delež mitohondrijskih genov, normalizacija
-     - izzivi: redkost (dropout), paketni učinki, multipleksiranje -->
+Več raziskav povezuje klonsko ekspanzijo celic T z odzivom na zaviralce imunskih kontrolnih točk. Pri bolnikih z melanomom, ki so se odzvali na blokado PD-1, je bil repertoar celic T v tumorju že pred zdravljenjem bolj klonalen, med zdravljenjem pa se je število celic T CD8+ v tumorju povečalo [@tumeh2014]. Yost in sodelavci so primerjali tumorske celice T pri bolnikih s karcinomom kože pred blokado PD-1 in po njej. Po zdravljenju so se v tumorju namnožili predvsem kloni, ki jih pred zdravljenjem v tumorju niso zaznali, kar kaže, da odziv nosijo tudi celice T, ki pridejo v tumor od drugod [@yost2019]. Wu in sodelavci so pri več vrstah raka pokazali, da imajo bolniki, pri katerih se tumorski kloni namnožijo tudi v krvi in sosednjem normalnem tkivu, boljši klinični odziv. Klonska ekspanzija v periferni krvi je torej lahko neinvaziven pokazatelj dogajanja v tumorju [@wu2020].
+
+Luoma in sodelavci so preučili bolnike z rakom ustne votline, ki so pred operacijo prejeli zaviralce imunskih kontrolnih točk. Z analizo posameznih celic iz krvi in tumorja pred zdravljenjem in po njem so ugotovili, da se po zdravljenju najprej namnožijo tkivne spominske celice T (angl. *tissue-resident memory T cells*) in da se odzivni kloni nahajajo tako v tumorju kot v krvi [@luoma2022]. Podatki te raziskave so javno dostopni in so osnova za model TRIM, ki ga opisujemo v nadaljevanju, ter za to delo. Izsledki naštetih raziskav kažejo, da je napoved, kateri kloni se bodo po zdravljenju namnožili, smiselna pot k razumevanju in napovedovanju odziva na imunoterapijo (slika 1).
+
+<!-- SLIKA 1 (lastna): shema klonske ekspanzije – klon pred terapijo in po njej v krvi in tumorju.
+     Napis pod sliko, npr.: »Slika 1: Klonska ekspanzija limfocitov T po imunoterapiji. Prirejeno po [..].« -->
+
+## Sekvenciranje posameznih celic
+
+Sekvenciranje RNA posameznih celic (angl. *single-cell RNA sequencing*, scRNA-seq) izmeri izražanje več tisoč genov v vsaki od več deset tisoč celic. Pri pogostem pristopu z mikrokapljicami vsako celico zapremo v kapljico z gelsko kroglico, ki nosi celično črtno kodo in edinstvene molekulske identifikatorje (angl. *unique molecular identifiers*, UMI). Črtna koda vsak prepis pripiše izvorni celici, identifikatorji UMI pa omogočajo štetje posameznih molekul mRNA [@zheng2017]. Rezultat je matrika števila prepisov za vsak gen v vsaki celici. Isti postopek lahko dopolnimo s ciljnim pomnoževanjem zaporedij TCR (scTCR-seq), tako da za vsako celico poleg transkriptoma dobimo še zaporedji verig α in β njenega receptorja [@pai2021]. Klonsko pripadnost celice tako neposredno povežemo z njenim funkcijskim stanjem.
+
+Podatki scRNA-seq so redki in šumni. V vsaki celici zajamemo le majhen del molekul mRNA, zato ima matrika veliko ničel, med katerimi so tudi geni, ki se v celici sicer izražajo. Na meritve vplivajo tudi tehnični dejavniki, kot so globina sekvenciranja, kakovost celic in serija, v kateri smo vzorce obdelali [@luecken2019]. Pred analizo zato podatke filtriramo (odstranimo prazne kapljice, poškodovane celice z velikim deležem mitohondrijskih prepisov in kapljice z dvema celicama), normaliziramo in po potrebi popravimo za paketne učinke (angl. *batch effects*) [@luecken2019].
 
 ## Globoki generativni modeli za podatke posameznih celic
 
-<!-- - avtokodirnik in VAE (ELBO, latentni prostor), scVI kot zgled
-     - multimodalni VAE (product/mixture of experts, povprečenje latentnih porazdelitev)
-     - TRIM: arhitektura, pogojevanje na tkivo in fazo zdravljenja, generiranje celic za napoved ekspanzije, psevdokloni -->
+Zaradi velike razsežnosti in šuma podatke scRNA-seq pogosto predstavimo v prostoru z bistveno manj razsežnostmi. Variacijski avtokodirnik (angl. *variational autoencoder*, VAE) je generativni model iz dveh nevronskih mrež. Kodirnik vsako opazovanje $x$ preslika v porazdelitev $q_\phi(z \mid x)$ latentne spremenljivke $z$, dekodirnik pa iz vzorca te porazdelitve rekonstruira opazovanje s porazdelitvijo $p_\theta(x \mid z)$. Model učimo z maksimizacijo spodnje meje logaritma verjetja podatkov (angl. *evidence lower bound*, ELBO) [@kingma2013]:
 
-## Celični metabolizem limfocitov T
+$$\log p_\theta(x) \geq \mathbb{E}_{q_\phi(z \mid x)}\left[\log p_\theta(x \mid z)\right] - D_{\mathrm{KL}}\left(q_\phi(z \mid x)\,\|\,p(z)\right) \qquad (1)$$
 
-<!-- - metabolno preprogramiranje ob aktivaciji (glikoliza, OXPHOS, glutaminoliza), naivne vs efektorske vs spominske celice
-     - metabolizem v tumorskem mikrookolju (hipoksija, pomanjkanje glukoze), izčrpanost T-celic
-     - zakaj bi metabolno stanje lahko napovedovalo proliferacijo/ekspanzijo -->
+Prvi člen enačbe 1 meri, kako dobro dekodirnik rekonstruira podatke, drugi pa z Kullback-Leiblerjevo divergenco kaznuje odmik latentne porazdelitve od apriorne porazdelitve $p(z)$, običajno standardne normalne [@kingma2013]. Lopez in sodelavci so VAE prilagodili podatkom scRNA-seq z modelom scVI. Ta štetja prepisov modelira z ustrezno verjetnostno porazdelitvijo, upošteva različno globino sekvenciranja in paketne učinke ter v enem ogrodju omogoča združevanje podatkov, gručenje in iskanje različno izraženih genov [@lopez2018].
 
-## Ocenjevanje metabolnih fluksov iz transkriptomskih podatkov
+Kadar za isto celico merimo več vrst podatkov (modalitet), na primer transkriptom in TCR, lahko vsako modaliteto obdelamo z lastnim kodirnikom in obe preslikamo v skupen latentni prostor. Na tem načelu so He in sodelavci razvili model TRIM (angl. *TCR-RNA Integrating Model*), pogojni multimodalni VAE, ki združuje podatke scRNA-seq in scTCR-seq [@he2026trim]. TRIM vsako celico predstavi z izražanjem genov in z zaporedjem regije CDR3 verige β. Zaporedje najprej zakodira s fizikalno-kemijskimi opisniki aminokislin in ga s konvolucijskim avtokodirnikom stisne v vektor. Model je pogojen na bolnika, tkivo (kri ali tumor) in čas vzorčenja (pred zdravljenjem ali po njem). Avtorji so ugotovili, da sama podobnost zaporedij TCR skoraj ni povezana z izražanjem genov in da modaliteti povezuje predvsem velikost klona. TRIM zato z dodatno kontrastno funkcijo izgube v rekonstrukciji TCR celice istega klona približa, celice različnih klonov pa razmakne [@he2026trim].
 
-<!-- - genomski metabolni modeli (Human-GEM), stehiometrična matrika, FBA, pFBA
-     - kontekstno specifični modeli (iMAT, INIT/ftINIT, RAVEN)
-     - metode za posamezne celice: Compass, scFEA, METAFlux — prednosti in omejitve
-     - pravila GPR in ocene aktivnosti reakcij -->
+Ključna lastnost modela TRIM je napovedovanje nemerjenih stanj (slika 2). Model celico iz krvi pred zdravljenjem preslika v latentni prostor, pogoj »pred zdravljenjem« zamenja s pogojem »po zdravljenju« in iz dobljenega latentnega vektorja generira nove celice. Generirana zaporedja TCR združi v psevdoklone (angl. *pseudoclones*) in iz primerjave njihove velikosti z velikostjo klona pred zdravljenjem napove, ali se bo klon namnožil [@he2026trim]. Na podatkih bolnikov s HNSCC iz raziskave Luome in sodelavcev [@luoma2022] je TRIM ekspanzijo klonov v krvi napovedal s ploščino pod krivuljo ROC 0,92, izhodiščna klasifikatorja (metoda najbližjih sosedov in večplastni perceptron) pa sta bila blizu naključnega ugibanja [@he2026trim]. Geni, ki so k napovedi najbolj prispevali, so bili obogateni s programi celičnega cikla, citotoksičnosti, aktivacije in migracije [@he2026trim]. TRIM uporablja dve modaliteti, RNA in TCR; metabolnega stanja celice ne modelira eksplicitno.
 
-## Vrzel v znanju
+<!-- SLIKA 2 (lastna): shema TRIM – kodirnika RNA in TCR, skupni latentni prostor, pogoji (bolnik, tkivo, čas),
+     dekodirnika, psevdokloni. »Prirejeno po [He in sod.]«. Vse oznake v slovenščini. -->
 
-<!-- 1 odstavek: TRIM uporablja le RNA + TCR; metabolna informacija ni eksplicitno vključena;
-     ni znano, ali fluksi kot dodatna modaliteta izboljšajo napoved klonske ekspanzije. -->
+## Metabolizem limfocitov T
+
+Aktivacija celice T sproži obsežno metabolno preprogramiranje. Mirujoče naivne in spominske celice T porabijo malo energije, ki jo pridobivajo predvsem z oksidativno fosforilacijo in oksidacijo maščobnih kislin. Po prepoznavi antigena se celica začne hitro deliti in izločati efektorske molekule, zato močno poveča privzem glukoze in glutamina ter preklopi na aerobno glikolizo, podobno kot rakave celice [@pearce2013; @buck2015]. Glikoliza in z njo povezane poti, kot sta pentozafosfatna pot in sinteza serina, poleg energije zagotavljajo gradnike za sintezo nukleotidov, aminokislin in lipidov, ki jih celica potrebuje za delitev [@buck2015; @chapman2020]. Pomemben regulator tega preklopa je transkripcijski dejavnik Myc: brez njega aktivirane celice T ne povečajo glikolize in glutaminolize, njihova rast in delitev pa sta zavrti [@wang2011]. Naivne, efektorske in spominske celice T se torej razlikujejo tudi po metabolnem programu. Metabolizem ne sledi le aktivaciji, temveč aktivno usmerja odločitve o usodi celice [@buck2015; @chapman2020].
+
+V tumorskem mikrookolju so celice T izpostavljene pomanjkanju hranil, hipoksiji in kopičenju presnovkov, kot je laktat. Tumorske celice porabljajo glukozo in s tem omejijo glikolizo infiltriranih celic T, kar zmanjša njihovo efektorsko delovanje in prispeva k napredovanju tumorja [@chang2015]. Ob dolgotrajni izpostavljenosti antigenu celice T postopoma izgubijo efektorske funkcije in sposobnost delitve ter trajno izražajo zaviralne receptorje, kot je PD-1. To stanje imenujemo izčrpanost celic T (angl. *T-cell exhaustion*); izčrpane celice imajo spremenjen tudi metabolizem [@wherry2015]. Signalizacija PD-1 sama neposredno zavira glikolizo ter spodbuja lipolizo in oksidacijo maščobnih kislin [@patsoukis2015]. Blokada PD-1 bi zato lahko deloma delovala prek obnove metabolne zmogljivosti celic T [@chang2015; @patsoukis2015].
+
+Delitev celice in s tem klonska ekspanzija sta metabolno zahtevni. Metabolno stanje celice T pred zdravljenjem bi zato lahko vsebovalo informacijo o tem, ali se bo celica po sprostitvi zavore PD-1 lahko namnožila. Neposredno merjenje metabolizma posameznih celic iz kliničnih vzorcev je težavno, izražanje metabolnih genov pa je v podatkih scRNA-seq dostopno. Metabolno aktivnost zato lahko ocenimo posredno iz transkriptoma, če upoštevamo zgradbo metabolne mreže.
+
+## Genomski metabolni modeli in ocenjevanje metabolnih fluksov
+
+Genomski metabolni model (angl. *genome-scale metabolic model*, GEM) je matematični opis vseh znanih metabolnih reakcij organizma. Vsebuje seznam presnovkov in reakcij, njihovo stehiometrijo, celične predelke ter pravila, ki povezujejo gene z reakcijami (angl. *gene–protein–reaction rules*, pravila GPR). Pravila GPR so logični izrazi, ki povedo, kateri genski produkti katalizirajo reakcijo: izoencime povezuje operator ALI, podenote encimskih kompleksov pa operator IN [@thiele2010]. Za človeka je na voljo model Human-GEM, ki združuje in usklajuje prejšnje modele človeškega metabolizma v enoten model z več tisoč reakcijami, presnovki in geni. Avtorji ga razvijajo odprto v javnem repozitoriju z nadzorom različic, kar raziskovalni skupnosti omogoča sprotno popravljanje in dopolnjevanje [@robinson2020].
+
+Osnova analize modelov GEM je stehiometrična matrika $S$, katere vrstice predstavljajo presnovke, stolpci pa reakcije. Predpostavimo stacionarno stanje, v katerem se koncentracije notranjih presnovkov ne spreminjajo, zato mora vektor fluksov $v$ zadoščati enačbi $S v = 0$. Spodnje in zgornje meje posameznih fluksov izražajo ireverzibilnost reakcij in razpoložljivost hranil. Ker je reakcij več kot presnovkov, ima sistem neskončno mnogo rešitev. Analiza ravnotežja fluksov (angl. *flux balance analysis*, FBA) med njimi izbere tisto, ki maksimizira izbrano ciljno funkcijo, na primer nastanek biomase [@orth2010]:
+
+$$\max_{v}\; c^{\mathsf{T}} v \quad \text{pri pogojih} \quad S v = 0, \quad v_{\min} \leq v \leq v_{\max} \qquad (2)$$
+
+Vektor $c$ v enačbi 2 določa, katere reakcije sestavljajo ciljno funkcijo. Problem je linearen, zato ga tudi za modele z več tisoč reakcijami rešimo hitro [@orth2010] (slika 3).
+
+<!-- Human-GEM: točna števila reakcij in genov za uporabljeno različico vpišemo v Metodah (iz repozitorija Human-GEM).
+     SLIKA 3 (lastna): majhna mreža, njena stehiometrična matrika S in dopustni prostor fluksov. -->
+
+Splošni model, kot je Human-GEM, vsebuje reakcije vseh človeških celic, posamezna celica ali tkivo pa jih uporablja le del. Metode za izdelavo kontekstno specifičnih modelov zato iz splošnega modela na podlagi podatkov o izražanju genov izluščijo podmrežo reakcij, ki so v danem tkivu verjetno aktivne. Metoda iMAT išče porazdelitev fluksov, ki se najbolje ujema z vzorcem visoko in nizko izraženih genov [@shlomi2008]. Metoda INIT poišče podmrežo, ki je skladna s podatki o prisotnosti proteinov in hkrati omogoča delovanje osnovnih metabolnih funkcij [@agren2012]. Algoritem ftINIT je hitrejša različica te družine metod, prilagojena za podatke scRNA-seq; Gustafsson in sodelavci so z njim izdelali modele za posamezne celične tipe [@gustafsson2023]. Algoritem je del programskega paketa RAVEN za izdelavo in analizo metabolnih modelov [@wang2018raven; @gustafsson2023].
+
+Za oceno metabolne aktivnosti v posameznih celicah so raziskovalci razvili več metod, ki se razlikujejo po tem, koliko zgradbe metabolne mreže upoštevajo. Compass za vsako celico iz izražanja genov oceni, kako zlahka celica izvede posamezno reakcijo v okviru omejitev genomskega metabolnega modela; z njim so avtorji odkrili metabolne regulatorje patogenosti celic Th17 [@wagner2021]. scFEA metabolno mrežo poenostavi v manjše število modulov in z grafovsko nevronsko mrežo iz izražanja genov oceni flukse skozi module, pri čemer kot omejitev uporablja ravnotežje presnovkov med moduli [@alghamdi2021]. METAFlux iz izražanja genov s pravili GPR izračuna ocene aktivnosti reakcij, z njimi omeji flukse v modelu Human-GEM in nato z optimizacijo oceni porazdelitev fluksov za vzorec ali skupino celic [@huang2023]. Vse te metode iz istih podatkov scRNA-seq dobijo nov, biološko razložljiv opis celice: namesto izražanja posameznih genov opišejo, katere metabolne poti so v celici verjetno dejavne. Razlikujejo pa se v predpostavkah, natančnosti in računski zahtevnosti, zato je izbira metode odvisna od namena uporabe.
+
+## Metabolna informacija in napoved klonske ekspanzije
+
+Model TRIM pokaže, da lahko iz transkriptoma in receptorja celic T v krvi pred zdravljenjem napovemo ekspanzijo klonov po imunoterapiji [@he2026trim]. Delitev celic T je tesno povezana z njihovim metabolnim stanjem, tumorsko mikrookolje in signalizacija PD-1 pa metabolizem celic T neposredno zavirata [@buck2015; @chang2015; @patsoukis2015]. Metode za ocenjevanje metabolnih fluksov izražanje genov povzamejo v obliki, ki upošteva stehiometrijo in povezanost reakcij. Tako lahko izpostavijo metabolne razlike med celicami, ki jih model na ravni posameznih genov ne zajame neposredno. Med njimi scFEA oceni flukse za vsako celico posebej in celico opiše z razmeroma majhnim številom metabolnih modulov [@alghamdi2021], zato ga lahko v multimodalni model vključimo kot dodatno modaliteto na ravni posameznih celic. Ni pa znano, ali takšna metabolna predstavitev celice vsebuje informacijo o klonski ekspanziji, ki je transkriptom in receptor celic T še ne vsebujeta, in ali njena vključitev v multimodalni generativni model izboljša napoved odziva celic T na imunoterapijo.
