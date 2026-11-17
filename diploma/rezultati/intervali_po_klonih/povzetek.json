@@ -1,0 +1,39 @@
+{
+  "bolnik_23": {
+    "n_celic_nove": 1153,
+    "n_eksp_nove": 364,
+    "n_eksp_klonov_nove": 27,
+    "n_celic": 1159,
+    "n_eksp": 364,
+    "n_eksp_klonov": 27
+  },
+  "bolnik_24": {
+    "n_celic_nove": 507,
+    "n_eksp_nove": 20,
+    "n_eksp_klonov_nove": 5,
+    "n_celic": 523,
+    "n_eksp": 23,
+    "n_eksp_klonov": 7
+  },
+  "semena_znacilno_delong": 9,
+  "semena_znacilno_boot": 6,
+  "semena_pari": 16,
+  "rna_tcr": {
+    "nad_izhodiscem_delong": 5,
+    "nad_izhodiscem_boot": 4,
+    "nad_izhodiscem_nove_boot": 4,
+    "zagonov": 5
+  },
+  "flux_tcr": {
+    "nad_izhodiscem_delong": 4,
+    "nad_izhodiscem_boot": 1,
+    "nad_izhodiscem_nove_boot": 1,
+    "zagonov": 6
+  },
+  "rna_flux_tcr": {
+    "nad_izhodiscem_delong": 6,
+    "nad_izhodiscem_boot": 3,
+    "nad_izhodiscem_nove_boot": 3,
+    "zagonov": 6
+  }
+}

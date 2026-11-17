@@ -319,11 +319,11 @@ def slika_auc(df, plt, pot):
                 ax.hlines(r.auc_najboljse_izhodisce, x - 0.08, x + 0.08, color='#52514e', lw=1.6, zorder=2)
                 ax.errorbar(x, r.auc, yerr=[[r.auc - r.ip_spodaj], [r.ip_zgoraj - r.auc]], fmt=OZNAKE[razl],
                             color=BARVE[razl], ms=5.5, mec='white', mew=0.8, elinewidth=1.2, capsize=0, zorder=3)
-                ax.text(x, 0.385, f'{int(r.seme)}', ha='center', va='center', fontsize=7, color='#52514e')
+                ax.text(x, 0.335, f'{int(r.seme)}', ha='center', va='center', fontsize=7, color='#52514e')
         ax.set_xticks(range(len(RAZLICICE)))
         ax.set_xticklabels([IMENA[r].replace(' + fluksi + ', ' +\nfluksi + ') for r in RAZLICICE])
         ax.set_xlim(-0.5, len(RAZLICICE) - 0.5)
-        ax.set_ylim(0.36, 1.0)
+        ax.set_ylim(0.31, 1.0)
         ax.set_yticks(np.arange(0.4, 1.01, 0.1))
         ax.yaxis.set_major_formatter(FuncFormatter(vejica))
         ax.grid(axis='y', color='#e4e3df', lw=0.6, zorder=0)
@@ -386,7 +386,17 @@ def main():
 
     plt = nastavi_matplotlib()
     slika_roc(zapisi, plt, os.path.join(SLIKE, 'roc_izpusceni_bolniki.png'))
-    slika_auc(df, plt, os.path.join(SLIKE, 'auc_semena_izhodisca.png'))
+    # Na sliki so intervali bootstrap po klonih (intervali_po_klonih.py), če so že izračunani; sicer DeLongovi.
+    boot = os.path.join(IZHOD, 'intervali_po_klonih', 'zagoni.csv')
+    df_slika = df
+    if os.path.exists(boot):
+        b = pd.read_csv(boot)
+        b = b[b.razlicica != 'velikost_klona'][['bolnik', 'razlicica', 'seme', 'glavni', 'boot_sp', 'boot_zg']]
+        b['seme'] = b.seme.astype(int)
+        df_slika = df.merge(b, on=['bolnik', 'razlicica', 'seme', 'glavni'], how='left', validate='one_to_one')
+        assert df_slika.boot_sp.notna().all(), 'intervali bootstrap manjkajo za nekatere zagone'
+        df_slika = df_slika.assign(ip_spodaj=df_slika.boot_sp, ip_zgoraj=df_slika.boot_zg)
+    slika_auc(df_slika, plt, os.path.join(SLIKE, 'auc_semena_izhodisca.png'))
 
     pd.set_option('display.width', 200)
     print(glavni[['razlicica', 'bolnik', 'seme', 'auc', 'ip_spodaj', 'ip_zgoraj', 'tau', 'delez_y0',
