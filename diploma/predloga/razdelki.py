@@ -7,6 +7,7 @@
    kot v Vzorcu 2026.
 4. Prvi odsek (do Uvoda) nima številk strani; od Uvoda naprej so arabske številke spodaj na sredini, od 1.
 5. Wordu naroči, naj ob odprtju posodobi polja (kazalo).
+6. Besedilo v tabelah (razen seznama kratic) nastavi na 10 pt.
 Uporaba: python3 predloga/razdelki.py izhod/diploma.docx metadata.yaml
 """
 import copy
@@ -147,5 +148,30 @@ if settings.find(qn("w:updateFields")) is None:
     anchor = next((el for el in settings if any(el.tag == qn(t) for t in after)), None)
     (anchor.addprevious(u) if anchor is not None else settings.append(u))
 
+# 6. Tabele z rezultati v 10 pt (seznam kratic ostane 12 pt), da široke tabele ne lomijo števil
+M_NS = "http://schemas.openxmlformats.org/officeDocument/2006/math"
+n_tabel = 0
+for t in doc.tables:
+    if t.rows and t.rows[0].cells and t.rows[0].cells[0].text.strip() == "Kratica":
+        continue
+    n_tabel += 1
+    for el in t._tbl.iter(qn("w:r"), f"{{{M_NS}}}r"):
+        rpr = el.find(qn("w:rPr"))
+        if rpr is None:
+            rpr = OxmlElement("w:rPr")
+            el.insert(0 if el.tag == qn("w:r") else len(el) - 1, rpr)
+        for tag in ("w:sz", "w:szCs"):
+            old_ = rpr.find(qn(tag))
+            if old_ is not None:
+                rpr.remove(old_)
+        # vrstni red v w:rPr je predpisan (ECMA-376): sz in szCs stojita pred highlight, u, vertAlign, lang ...
+        za = [qn("w:" + x) for x in ("highlight", "u", "effect", "bdr", "shd", "fitText", "vertAlign", "rtl",
+                                     "cs", "em", "lang", "eastAsianLayout", "specVanish", "oMath")]
+        sidro = next((c for c in rpr if c.tag in za), None)
+        for tag in ("w:sz", "w:szCs"):
+            e = OxmlElement(tag); e.set(qn("w:val"), "20")
+            (sidro.addprevious(e) if sidro is not None else rpr.append(e))
+
 doc.save(docx_path)
+print(f"tabele v 10 pt: {n_tabel}")
 print(f"razdelki: {len(order)} (prvi odsek {is_main.count(False)}, drugi odsek {is_main.count(True)})")

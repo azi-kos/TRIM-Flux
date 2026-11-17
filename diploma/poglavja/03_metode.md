@@ -7,10 +7,7 @@
 
 Potek dela od surovih podatkov do vrednotenja prikazuje slika 4. Vso analizo smo izvedli v zvezkih Jupyter v okolju Google Colab; koda je v repozitoriju TRIM-Flux (razdelek 3.8).
 
-<!-- SLIKA 4 (lastna, shema): GEO → kontrola kakovosti in normalizacija → (RNA: PCA 100) / (TCR: CDR3β → Atchley → CNN, 100) /
-     (surova štetja → scFEA, 168 modulov → z) → TRIM (tri različice) → psevdokloni → AUC na izpuščenem bolniku. -->
-
-**[Slika 4: potek dela od surovih podatkov do vrednotenja napovedi. Narišem jo po pregledu besedila.]**
+![Slika 4: Potek dela od surovih podatkov do vrednotenja napovedi. Iz istih celic smo pripravili tri modalitete (transkriptom, receptor TCR in metabolne flukse), ki smo jih v različnih kombinacijah dali v model TRIM. Številke v oklepajih so razdelki tega poglavja.](slike/potek_dela.png){width=100%}
 
 ## Podatki
 
@@ -18,10 +15,44 @@ Uporabili smo javno dostopne podatke raziskave Luome in sodelavcev [@luoma2022] 
 
 Vzorce z oznakama B1 (kri) in Pre-Tx (tumor) smo obravnavali kot vzorce pred zdravljenjem, vzorce z oznakama B2 (kri) in Post-Tx (tumor) pa kot vzorce po zdravljenju. Vzorcev z oznako B3 nismo uporabili, ker zanje zbirka ne vsebuje matrik štetij. Kombinacijo tkiva (kri ali tumor) in časa vzorčenja (pred zdravljenjem ali po njem) imenujemo kvadrant. Bolnike smo oštevilčili od 0 do 27 po abecednem vrstnem redu njihovih oznak v zbirki GEO. V nadaljevanju jih navajamo s temi indeksi, oznake GEO pa so v tabeli 1.
 
-<!-- ZVEZEK: tabela1_celice_po_bolnikih.csv (bolnik_indeks, bolnik_id, kvadranti, CD4/CD8, kloni, ekspandirane celice).
-     Število bolnikov (28) preveri v povzetek_podatkov.json. -->
+Po kontroli kakovosti (razdelek 3.2) je ostalo 69 930 celic, od tega 44 403 celic CD4+ in 25 527 celic CD8+ (tabela 1). V krvi pred zdravljenjem je bilo 17 963 celic, v krvi po zdravljenju 15 342, v tumorju pred zdravljenjem 8702 in v tumorju po zdravljenju 27 923. Celice so imele 48 110 različnih zaporedij CDR3β. Vzorca krvi pred zdravljenjem in po njem je imelo 24 bolnikov, vse štiri kvadrante pa štirje bolniki (18, 19, 24 in 27).
 
-**[Tabela 1: število celic po bolnikih in kvadrantih po kontroli kakovosti. Vstavim jo po zagonu statističnega zvezka.]**
+<!-- Vir: data_labels.pkl in df_all_tcrs.pkl z Drive (27. 7. 2026), izračun v zvezku colab_preverba_klonov.ipynb in
+     scratchpad tabela1.csv; ekspanzija po oznaki iz kode (štetje prek vseh bolnikov). -->
+
+Table: Tabela 1: Število celic po bolnikih in kvadrantih po kontroli kakovosti. GEO je oznaka bolnika v zbirki GEO. Kloni so različna zaporedja CDR3β pri bolniku. Zadnja stolpca navajata celice in klone v krvi pred zdravljenjem, ki so po zdravljenju ekspandirani (razdelek 3.7). Ker smo celice klonov šteli prek vseh bolnikov, imata nekaj ekspandiranih celic tudi bolnika 16 in 20, ki nimata vzorca krvi po zdravljenju. Bolnika, ki smo ju izpustili pri učenju, sta označena krepko.
+
+| Bolnik | GEO | Kri pred | Kri po | Tumor pred | Tumor po | Skupaj | Kloni | Eksp. celice | Eksp. kloni |
+|--------|------|-------:|-------:|-------:|-------:|-------:|-------:|--------:|--------:|
+| 0 | P01 | 571 | 449 | 0 | 0 | 1020 | 911 | 18 | 7 |
+| 1 | P02 | 341 | 369 | 0 | 0 | 710 | 642 | 10 | 4 |
+| 2 | P04 | 846 | 800 | 0 | 0 | 1646 | 1395 | 41 | 8 |
+| 3 | P05 | 676 | 683 | 0 | 0 | 1359 | 1058 | 75 | 8 |
+| 4 | P08 | 447 | 460 | 0 | 0 | 907 | 779 | 26 | 5 |
+| 5 | P09 | 854 | 788 | 0 | 0 | 1642 | 1457 | 22 | 12 |
+| 6 | P10 | 804 | 473 | 0 | 0 | 1277 | 1118 | 14 | 5 |
+| 7 | P12 | 1021 | 1150 | 0 | 0 | 2171 | 1888 | 76 | 22 |
+| 8 | P13 | 1088 | 1219 | 0 | 321 | 2628 | 2319 | 2 | 2 |
+| 9 | P14 | 409 | 503 | 0 | 1088 | 2000 | 1358 | 54 | 4 |
+| 10 | P15 | 842 | 1056 | 0 | 2034 | 3932 | 2583 | 49 | 13 |
+| 11 | P16 | 334 | 401 | 0 | 1985 | 2720 | 1553 | 26 | 6 |
+| 12 | P17 | 380 | 343 | 0 | 0 | 723 | 709 | 0 | 0 |
+| 13 | P18 | 803 | 0 | 2942 | 1781 | 5526 | 2161 | 0 | 0 |
+| 14 | P19 | 468 | 421 | 0 | 1602 | 2491 | 2202 | 7 | 6 |
+| 15 | P20 | 824 | 537 | 0 | 2425 | 3786 | 2158 | 2 | 2 |
+| 16 | P21 | 464 | 0 | 0 | 1950 | 2414 | 1597 | 1 | 1 |
+| 17 | P22 | 540 | 494 | 0 | 1915 | 2949 | 2268 | 0 | 0 |
+| 18 | P23 | 600 | 918 | 33 | 1600 | 3151 | 2263 | 102 | 24 |
+| 19 | P24 | 674 | 467 | 1338 | 464 | 2943 | 2389 | 5 | 4 |
+| 20 | P25 | 1196 | 0 | 0 | 604 | 1800 | 1566 | 2 | 2 |
+| 21 | P26 | 636 | 228 | 0 | 778 | 1642 | 1376 | 1 | 1 |
+| 22 | P27 | 0 | 0 | 1462 | 1379 | 2841 | 1828 | 0 | 0 |
+| **23** | **P28** | **1159** | **1290** | **0** | **1811** | **4260** | **2384** | **364** | **27** |
+| **24** | **P29** | **523** | **709** | **1888** | **2791** | **5911** | **3947** | **23** | **7** |
+| 25 | P30 | 445 | 311 | 0 | 597 | 1353 | 1062 | 8 | 2 |
+| 26 | P31 | 580 | 723 | 0 | 1695 | 2998 | 1623 | 133 | 19 |
+| 27 | P32 | 438 | 550 | 1039 | 1103 | 3130 | 2194 | 1 | 1 |
+| skupaj | | 17 963 | 15 342 | 8702 | 27 923 | 69 930 | | 1062 | 192 |
 
 ## Predobdelava podatkov
 
@@ -90,7 +121,7 @@ Table: Tabela 2: Hiperparametri modela TRIM, enaki za vse različice in bolnike 
 
 Metabolne flukse smo ocenili z metodo scFEA [@alghamdi2021]. Uporabili smo njen model človeškega metabolizma s 168 metabolnimi moduli, ki so med seboj povezani prek 70 presnovkov (datoteki `module_gene_m168.csv` in `cmMat_c70_m168.csv` iz repozitorija scFEA). Za vsak modul je znan seznam genov, katerih produkti katalizirajo njegove reakcije. scFEA za vsak nabor podatkov nauči grafovsko nevronsko mrežo, ki iz izražanja genov modula oceni fluks skozi modul v posamezni celici. Mreža se uči brez oznak, z minimizacijo vsote štirih členov [@alghamdi2021]: neravnotežja presnovkov med moduli, kazni za negativne flukse, odstopanja vsote fluksov celice od skupnega izražanja genov v celici in razlike med fluksi modulov celice ter povprečnim izražanjem genov teh modulov.
 
-Na vhod smo dali surova štetja genov, ki so v seznamih genov modulov <!-- ZVEZEK: scfea_geni.json, nasih_genov_v_modulih -->. scFEA vhodno matriko logaritmira ($\log_2(x+1)$), kadar njena največja vrednost preseže 50. Imputacije manjkajočih vrednosti nismo uporabili. Ostale nastavitve so bile privzete: 100 epoh, hitrost učenja 0,008 in optimizator Adam, pri čemer scFEA v vsaki epohi uporabi vse celice naenkrat. scFEA v izvorni kodi nastavi fiksno seme generatorja naključnih števil (16).
+Na vhod smo dali surova štetja genov, ki so v seznamih genov modulov. Od 663 genov modulov jih je bilo v naših podatkih 658. scFEA vhodno matriko logaritmira ($\log_2(x+1)$), kadar njena največja vrednost preseže 50. Imputacije manjkajočih vrednosti nismo uporabili. Ostale nastavitve so bile privzete: 100 epoh, hitrost učenja 0,008 in optimizator Adam, pri čemer scFEA v vsaki epohi uporabi vse celice naenkrat. scFEA v izvorni kodi nastavi fiksno seme generatorja naključnih števil (16).
 
 Izvorna koda scFEA od leta 2021 ni posodobljena, zato smo jo za novejše različice knjižnic popravili. Zanko, ki iz izražanja genov sestavi vhod mreže in je pri skoraj 70 000 celicah trajala več ur in porabila preveč pomnilnika, smo zamenjali z enakovrednim vektoriziranim izračunom in ujemanje rezultatov preverili na manjšem vzorcu. Tenzorje z grafičnega procesorja smo pred zapisom prenesli v glavni pomnilnik, zastarele funkcije knjižnice pandas pa zamenjali z novejšimi. Kljub temu vseh celic ni bilo mogoče obdelati naenkrat, zato smo jih v vrstnem redu iz predobdelave razdelili na 14 kosov po največ 5000 celic in scFEA pognali za vsak kos posebej. Vsak kos je tako dobil svojo naučeno mrežo, skupno izražanje celic pa je scFEA normaliziral s povprečjem znotraj kosa. Ker smo na vhod dali samo gene iz modulov, je scFEA skupno izražanje celice izračunal iz teh genov in ne iz vseh genov. Posledice obeh odločitev opisujemo v Razpravi.
 
@@ -120,7 +151,7 @@ Table: Tabela 3: Različice modela TRIM in vhodi izhodiščnih klasifikatorjev.
 
 **Shema »izpusti enega bolnika«.** Model smo vsakič učili brez enega bolnika. Učna množica je obsegala vse celice ostalih 27 bolnikov in celice izpuščenega bolnika iz krvi pred zdravljenjem. Te celice model potrebuje za vektor bolnika in so izhodišče napovedi, oznak ekspanzije pa ne vsebujejo. Celice izpuščenega bolnika iz krvi po zdravljenju in iz tumorja model med učenjem ni videl. Pri bolniku 23 je imela učna množica 66 829 celic, izpuščenih pa je bilo 3101 celic.
 
-**Izbira izpuščenih bolnikov.** AUC je zanesljiva le, če ima izpuščeni bolnik dovolj pozitivnih primerov. Kot merilo smo zato postavili vsaj 20 celic v krvi pred zdravljenjem, katerih klon se po zdravljenju razširi. Poskuse smo zaradi računske zahtevnosti izvedli za dva bolnika, ki merilo izpolnjujeta. Bolnik 24 je imel celice v vseh štirih kvadrantih in med vsemi bolniki največ celic v tumorju po zdravljenju, zato smo ga izbrali za prvi poskus. Bolnik 23 je bil med bolniki z največ ekspandiranimi celicami v krvi pred zdravljenjem. <!-- ZVEZEK: preveri v tabeli 1, ali ima bolnik 23 največ ekspandiranih celic. -->
+**Izbira izpuščenih bolnikov.** AUC je zanesljiva le, če ima izpuščeni bolnik dovolj pozitivnih primerov. Kot merilo smo zato postavili vsaj 20 celic v krvi pred zdravljenjem, katerih klon se po zdravljenju razširi. Merilo je izpolnilo 12 bolnikov (tabela 1). Poskuse smo zaradi računske zahtevnosti izvedli za dva od njih. Bolnik 24 je imel celice v vseh štirih kvadrantih in med vsemi bolniki največ celic v tumorju po zdravljenju, zato smo ga izbrali za prvi poskus. Bolnik 23 je imel med vsemi bolniki največ celic iz ekspandiranih klonov v krvi pred zdravljenjem (364).
 
 **Resnična ekspanzija.** Klon je ekspandiran, če ima v krvi po zdravljenju več celic kot v krvi pred zdravljenjem. Napoved smo vrednotili na vseh celicah izpuščenega bolnika iz krvi pred zdravljenjem; vsaka celica je dobila oznako svojega klona. Pri bolniku 23 je bilo takih celic 1159, od tega 364 (31,4 %) iz ekspandiranih klonov, pri bolniku 24 pa 523, od tega 23 (4,4 %).
 
@@ -139,6 +170,8 @@ Ocena 0 v enačbi 7 pomeni, da model celico pred zdravljenjem uvrsti v klon z en
 **Semena in ponovitve.** Vsako kombinacijo bolnika in različice smo učili s tremi semeni (0, 1 in 2). Seme določi začetne uteži, vrstni red celic v paketih in vzorčenje latentnih vektorjev (knjižnici NumPy in PyTorch). Nekatere operacije na grafičnem procesorju niso deterministične, zato se lahko zagona z istim semenom nekoliko razlikujeta. Izvedli smo 17 od 18 načrtovanih zagonov: pri bolniku 24 manjka zagon različice RNA + TCR s semenom 2. Zagon različice fluksi + TCR pri bolniku 23 s semenom 0 smo izvedli dvakrat. V glavni analizi smo uporabili prvi zagon, drugega pa le za oceno ponovljivosti pri istem semenu. Vsak zagon smo zapisali v datoteko JSON z resničnimi oznakami, ocenami $y_i$ in rezultati izhodiščnih klasifikatorjev.
 
 **Statistična analiza.** Za vsakega bolnika in različico smo poročali AUC posameznih semen ter njihovo povprečje in razpon. Interval zaupanja za AUC smo izračunali po DeLongovi metodi [@delong1988]. Različici smo primerjali na istih celicah pri istem bolniku in semenu z DeLongovim testom za korelirane krivulje ROC [@delong1988]. Z istim testom smo primerjali tudi zagone iste različice z različnimi semeni, podobnost razvrstitve celic med zagoni pa smo ocenili s Spearmanovim koeficientom korelacije ocen $y_i$ [@spearman1904]. Izhodiščne klasifikatorje smo testirali na drugi množici celic kot model TRIM, zato parni test zanje ni bil mogoč. AUC modela TRIM je bila višja od AUC izhodiščnega klasifikatorja, če je bila spodnja meja njenega 95-% intervala zaupanja nad AUC najboljšega izhodiščnega klasifikatorja iz istega zagona. Razlike v fluksih posameznih modulov med celicami iz ekspandiranih in neekspandiranih klonov v krvi pred zdravljenjem smo ocenili s testom Manna in Whitneyja [@mann1947] in vrednosti $p$ popravili za večkratno testiranje po Benjaminiju in Hochbergu [@benjamini1995]. Iz statistike $U$ smo izračunali tudi AUC posameznega modula, $U/(n_1 n_0)$, kjer sta $n_1$ in $n_0$ števili celic v obeh skupinah. Številke iz zapisov zagonov smo izračunali s skripto `rezultati_napovedi.py`, analize fluksov pa s statističnim zvezkom; oba sta v mapi `diploma/skripte` repozitorija.
+
+**Velikost klona kot izhodišče.** Oznaka ekspanzije primerja število celic klona v krvi po zdravljenju in pred njim, zato smo po zaključenih zagonih preverili, koliko AUC modela TRIM pojasni že velikost klona pred zdravljenjem. Za vsako celico izpuščenega bolnika iz krvi pred zdravljenjem smo kot oceno vzeli število celic njenega klona v krvi pred zdravljenjem, prešteto prek vseh bolnikov kot pri oznaki. Za primerjavo smo izračunali tudi oceni iz števila celic klona samo pri izpuščenem bolniku in iz števila celic klona v tumorju pred zdravljenjem. Ocene zagonov z različnimi semeni smo združili v ansambel: za vsako celico smo povprečili range njenih ocen $y_i$ v teh zagonih (vezi so dobile povprečni rang). Ansambel različice je združil vse zagone te različice pri bolniku, ansambel vseh zagonov pa vseh 9 zagonov pri bolniku 23 oziroma 8 pri bolniku 24. AUC smo izračunali na vseh celicah, posebej na celicah iz klonov z eno celico v krvi pred zdravljenjem in iz klonov z vsaj dvema celicama ter na ravni klonov, kjer je vsak klon štel enkrat z oceno, ki je bila povprečje ocen njegovih celic. Celice istega klona imajo enako oznako in niso neodvisne, zato smo intervale zaupanja na ravni celic izračunali z bootstrapom po klonih [@field2007]: 2000-krat smo s ponavljanjem izbrali klone, vzeli vse njihove celice in iz porazdelitve AUC odčitali 2,5. in 97,5. percentil. Z enakim postopkom smo ocenili interval za razliko v AUC med oceno modela in velikostjo klona. Na ravni klonov smo uporabili DeLongov interval zaupanja in parni DeLongov test [@delong1988]. Da bi preverili, ali model razlikuje med kloni enake velikosti, smo celice razvrstili po velikosti klona in celice z enako velikostjo razvrstili še po oceni modela. Ker je oznaka iz surovih števil celic odvisna od tega, koliko celic je bilo zajetih ob vsakem času, smo izračunali še oznako iz deležev: klon je bil ekspandiran, če je bil njegov delež med celicami bolnika v krvi po zdravljenju večji kot pred zdravljenjem. Povezavo med deležem ekspandiranih celic in razmerjem med številom celic v krvi po zdravljenju in pred njim smo pri 24 bolnikih z obema vzorcema krvi ocenili s Spearmanovim koeficientom korelacije [@spearman1904]. Analizo smo izvedli z zvezkom `colab_preverba_klonov.ipynb`, sliko 10 pa s skripto `slika_velikost_klona.py` (obe v mapi `diploma/skripte`).
 
 ## Programska in strojna oprema
 

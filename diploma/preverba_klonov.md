@@ -43,7 +43,7 @@ Signal onkraj velikosti klona je torej samo v različicah z RNA. Fluksi brez RNA
 - Med 24 bolniki z vzorci krvi pred zdravljenjem in po njem je delež ekspandiranih celic povezan z razmerjem števila zajetih celic po/pred (Spearman 0,58, p = 0,003). Pri oznaki iz deležev (delež klona med celicami bolnika ob tem času) je povezava šibkejša (0,32, p = 0,13).
 - Pri bolniku 23 oznaka iz deležev spremeni 62 od 1159 celic (364 → 302 ekspandiranih), AUC se malo zniža (velikost klona 0,931, RNA + TCR 0,894). Pri bolniku 24 se spremeni ena celica.
 - Združevanje števil čez bolnike (A9 v `pregled_kode.md`) na izpuščena bolnika skoraj ne vpliva (0 oziroma 1 celica).
-- Bolnik 23 je izjemno klonalen: le 48 % celic krvi pred zdravljenjem je v klonih z eno celico (drugi bolniki 63–99 %), ekspandiranih je 31 % celic (drugi 0–23 %).
+- Bolnik 23 je izjemno klonalen: le 47 % celic krvi pred zdravljenjem je v klonih z eno celico (drugi bolniki 63–99 %), ekspandiranih je 31 % celic (drugi 0–23 %).
 - Bolnik 23 nima vzorca tumorja pred zdravljenjem, pri bolniku 24 velikost klona v tumorju pred zdravljenjem ekspanzije ne napove (0,535).
 
 ## 4. Posledice za nadaljnje delo
