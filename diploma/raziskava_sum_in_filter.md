@@ -30,7 +30,7 @@ Razlaga: napovedna moč modela TRIM pri tej oznaki pride predvsem iz klonalnosti
 
 ## 3. Priporočilo
 
-1. **Najprej preverba v Colabu (okoli 30 min):** AUC prave velikosti klona v krvi pred zdravljenjem (iz `df_all_tcrs` in `data_labels`) za bolnika 23 in 24 ter AUC modela TRIM znotraj skupin klonov enake velikosti. Če izhodišče doseže ~0,9, vhodni podatki (RNA, fluksi, filter) na AUC skoraj ne vplivajo.
+1. **Najprej preverba v Colabu (okoli 30 min):** AUC prave velikosti klona v krvi pred zdravljenjem (iz `df_all_tcrs` in `data_labels`) za bolnika 23 in 24 ter AUC modela TRIM znotraj skupin klonov enake velikosti. Če izhodišče doseže ~0,9, vhodni podatki (RNA, fluksi, filter) na AUC skoraj ne vplivajo. *Narejeno 17. 11.: velikost klona da AUC 0,958 in 0,950, podrobnosti v `preverba_klonov.md`.*
 2. **Filter genov namesto novih fluksov kot prvi poskus:** csGEM iz ftINIT (vse celice T, brez bolnikov 23 in 24), nato TRIM z RNA samo iz genov csGEM in z RNA brez teh genov (koda za Var 3 že obstaja). To neposredno pove, ali metabolni geni nosijo signal, brez napak ocene fluksov, in je zgornja referenca za vsak fluks iz istih genov.
 3. **Novi fluksi (kvadratni program v csGEM) le, če metabolni geni dodajo signal** onkraj velikosti klona.
 4. **Pri vseh različicah združevati semena** (povprečje rangov), ker je razlika med semeni večja od razlike med različicami.
