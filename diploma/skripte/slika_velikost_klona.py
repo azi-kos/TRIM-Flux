@@ -1,4 +1,4 @@
-"""Slika 10: ekspanzija glede na velikost klona pred zdravljenjem in globino vzorčenja.
+"""Slika 6: ekspanzija glede na velikost klona pred zdravljenjem in globino vzorčenja.
 
 Bere izhode zvezka colab_preverba_klonov.ipynb v diploma/rezultati/preverba_klonov/:
     velikosti_klonov.csv      delež ekspandiranih klonov po velikosti klona v krvi pred zdravljenjem (bolnika 23, 24)
@@ -80,7 +80,7 @@ def main():
         ax.yaxis.set_major_formatter(FuncFormatter(vejica))
         ax.grid(axis='y', color=MREZA, lw=0.6, zorder=0)
         ax.tick_params(axis='x', length=0)
-        ax.set_xlabel('celic klona v krvi pred zdr.')
+        ax.set_xlabel('število celic klona v krvi\npred zdravljenjem')
         ax.text(-0.02, 1.06, crka, transform=ax.transAxes, fontweight='bold', fontsize=10, va='bottom', ha='right')
         ax.text(0.0, 1.06, f'bolnik {bolnik}', transform=ax.transAxes, fontsize=8.5, va='bottom')
     osi[0].set_ylabel('delež ekspandiranih klonov')
@@ -102,7 +102,7 @@ def main():
     ax.xaxis.set_major_formatter(FuncFormatter(vejica))
     ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _=None: vejica(v, dec=1)))
     ax.grid(color=MREZA, lw=0.6, zorder=0)
-    ax.set_xlabel('celice v krvi po/pred zdr.')
+    ax.set_xlabel('razmerje števila celic v krvi\npo in pred zdravljenjem')
     ax.set_ylabel('delež ekspandiranih celic')
     ax.text(0.03, 0.97, f'ρ = {vejica(rho, dec=2)}', transform=ax.transAxes, fontsize=7.5, va='top')
     ax.text(-0.02, 1.06, 'C', transform=ax.transAxes, fontweight='bold', fontsize=10, va='bottom', ha='right')

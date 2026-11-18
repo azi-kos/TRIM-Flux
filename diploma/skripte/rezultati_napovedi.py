@@ -15,9 +15,9 @@ Izhodi:
     diploma/rezultati/delong_semena.csv     parni DeLongov test med semeni (ista različica, isti bolnik)
     diploma/rezultati/pragovi.csv           metrike pri treh pragovih (iz zapisov)
     diploma/rezultati/povzetek.json         številke, ki jih navaja besedilo
-    diploma/rezultati/tabele.md             tabele 4–6 za poglavje Rezultati
-    diploma/slike/roc_izpusceni_bolniki.png  krivulje ROC (slika 6)
-    diploma/slike/auc_semena_izhodisca.png   AUC po semenih z intervali zaupanja in izhodišči (slika 7)
+    diploma/rezultati/tabele.md             tabele 2, 3 in 5 za poglavje Rezultati
+    diploma/slike/roc_izpusceni_bolniki.png  krivulje ROC (slika 4)
+    diploma/slike/auc_semena_izhodisca.png   AUC po semenih z intervali zaupanja in izhodišči (slika 5)
 
 Ničesar zunaj mape diploma/ ne spreminja.
 """
@@ -204,7 +204,7 @@ def p_besedilo(p):
 
 def tabele_md(df, povz, raz):
     glavni = df[df.glavni]
-    vrst = ['Table: Tabela 4: AUC napovedi klonske ekspanzije modela TRIM pri izpuščenih bolnikih 23 in 24. '
+    vrst = ['Table: Tabela 2: AUC napovedi klonske ekspanzije modela TRIM pri izpuščenih bolnikih 23 in 24. '
             'V oklepaju je 95-% interval zaupanja po DeLongu; »–« pomeni, da zagona nismo izvedli. '
             'Povprečje je izračunano po razpoložljivih semenih.', '',
             '| Različica | Seme | Bolnik 23 | Bolnik 24 |',
@@ -219,7 +219,7 @@ def tabele_md(df, povz, raz):
         pv = [st(povz[(povz.razlicica == razl) & (povz.bolnik == b)].povprecje.iloc[0]) for b in (23, 24)]
         vrst.append(f'|  | povprečje | {pv[0]} | {pv[1]} |')
 
-    vrst += ['', 'Table: Tabela 5: AUC izhodiščnih klasifikatorjev. Pri vhodih, ki smo jih uporabili v več zagonih, '
+    vrst += ['', 'Table: Tabela 3: AUC izhodiščnih klasifikatorjev. Pri vhodih, ki smo jih uporabili v več zagonih, '
              'je naveden razpon vrednosti.', '', '| Klasifikator | Vhod | Bolnik 23 | Bolnik 24 |', '|---|---|---|---|']
     vhodi = [('rna', 'RNA', ['rna_tcr', 'rna_flux_tcr']), ('tcr', 'TCR', RAZLICICE),
              ('both', 'RNA in TCR', ['rna_tcr', 'rna_flux_tcr']), ('flux', 'fluksi', ['flux_tcr']),
@@ -233,7 +233,7 @@ def tabele_md(df, povz, raz):
                 celice.append(st(lo) if lo == hi else f'{st(lo)}–{st(hi)}')
             vrst.append(f'| {ime_k} | {ime_v} | ' + ' | '.join(celice) + ' |')
 
-    vrst += ['', 'Table: Tabela 6: Razlika v AUC (ΔAUC) različic RNA + fluksi + TCR in fluksi + TCR do različice '
+    vrst += ['', 'Table: Tabela 5: Razlika v AUC (ΔAUC) različic RNA + fluksi + TCR in fluksi + TCR do različice '
              'RNA + TCR na istih celicah pri istem bolniku in semenu, s parnim DeLongovim testom. Pozitivna razlika '
              'pomeni višjo AUC različice s fluksi; pri bolniku 24 s semenom 2 zagona RNA + TCR nismo izvedli.', '',
              '| Bolnik | Seme | RNA + fluksi + TCR: ΔAUC | *p* | fluksi + TCR: ΔAUC | *p* |',
